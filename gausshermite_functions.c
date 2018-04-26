@@ -246,7 +246,8 @@ void qam_soft_decode(const double complex *y, int Ns, const double complex *C, i
   int i, k, j, bj;
   double tmp_num, tmp_den;
   
-    // Cycle through received symbol
+  // Cycle through received symbol
+  #pragma omp parallel for private(tmp_num,tmp_den,bj,k,j)
   for(i=0; i<Ns; i++)
   {
     // Cycle through constellation bit

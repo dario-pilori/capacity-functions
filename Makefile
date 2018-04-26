@@ -1,6 +1,6 @@
 CC = gcc
 MEX = mex
-CFLAGS = -O2 -fopenmp
+CFLAGS = -O2 -fopenmp -fPIC
 LDFLAGS = -lm 
 
 all: qam_gmi pam_gmi qam_gmi_sweep qam_gmi_mex qam_llr_mex
