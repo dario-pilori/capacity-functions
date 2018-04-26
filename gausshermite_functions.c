@@ -1,6 +1,5 @@
 #include "gausshermite_functions.h"
 
-
 // Gauss-Hermite parameters
 const double x[N_GH] = {-3.436159118837737603327,
 -2.532731674232789796409,
@@ -239,3 +238,44 @@ double qam_eval_gmi(const double complex *C, int M, double s)
   
   return GMI;
 }
+
+// Calculate log-likelihood ratios (LLRs) for equiprobable QAM
+void qam_soft_decode(const double complex *y, int Ns, const double complex *C, int M, double s, double *l)
+{
+  const int m = log2(M);
+  int i, k, j, bj;
+  double tmp_num, tmp_den;
+  
+    // Cycle through received symbol
+  for(i=0; i<Ns; i++)
+  {
+    // Cycle through constellation bit
+    for(k=0; k<m; k++)
+    {
+      // Initialize numerator and denominator of the logarithm
+      tmp_num = 0.0;
+      tmp_den = 0.0;
+      
+      // Numerator of the logarithm
+      for(j=0; j<M/2; j++)
+      {
+        bj = insert_zero(j, k, m) + (1<<k);
+        tmp_num += exp(-pow(cabs(y[i]-C[bj]),2.0)/pow(s,2.0));
+      }    
+      
+      // Denominator of the logarithm
+      for(j=0; j<M/2; j++)
+      {
+        bj = insert_zero(j, k, m);
+        tmp_den += exp(-pow(cabs(y[i]-C[bj]),2.0)/pow(s,2.0));
+      }
+      
+      // Calculate LLR
+      l[i*m + k] = log(tmp_num/tmp_den);
+    }      
+  }
+}
+
+
+
+

@@ -20,3 +20,4 @@ double pam_eval_mi(const double *C, int M, double s, const double *Pk);
 double pam_eval_gmi(const double *C, int M, double s);
 double qam_eval_mi(const double complex *C, int M, double s);
 double qam_eval_gmi(const double complex *C, int M, double s);
+void qam_soft_decode(const double complex *y, int Ns, const double complex *C, int M, double s, double *l);
