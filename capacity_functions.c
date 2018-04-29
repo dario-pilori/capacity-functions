@@ -1,3 +1,9 @@
+/*
+* capacity_functions.c
+* Set of functions to evaluate capacity
+*
+* 2018 - Dario Pilori <dario.pilori@polito.it>
+*/
 #include "capacity_functions.h"
 
 // Gauss-Hermite parameters
@@ -251,7 +257,7 @@ void qam_soft_decode(const double complex *y, int Ns, const double complex *C, i
   for(i=0; i<Ns; i++)
   {
     // Cycle through constellation bit
-    for(k=0; k<m; k++)
+    for(k=m-1; k>=0; k--)
     {
       // Initialize numerator and denominator of the logarithm
       tmp_num = 0.0;
@@ -260,15 +266,53 @@ void qam_soft_decode(const double complex *y, int Ns, const double complex *C, i
       // Numerator of the logarithm
       for(j=0; j<M/2; j++)
       {
-        bj = insert_zero(j, k, m) + (1<<k);
+        bj = insert_zero(j, k, m);
         tmp_num += exp(-pow(cabs(y[i]-C[bj]),2.0)/pow(s,2.0));
       }    
       
       // Denominator of the logarithm
       for(j=0; j<M/2; j++)
       {
-        bj = insert_zero(j, k, m);
+        bj = insert_zero(j, k, m) + (1<<k);
         tmp_den += exp(-pow(cabs(y[i]-C[bj]),2.0)/pow(s,2.0));
+      }
+      
+      // Calculate LLR
+      l[i*m + k] = log(tmp_num/tmp_den);
+    }      
+  }
+}
+
+// Calculate log-likelihood ratios (LLRs) for equiprobable PAM
+void pam_soft_decode(const double *y, int Ns, const double *C, int M, double s, double *l)
+{
+  const int m = log2(M);
+  int i, k, j, bj;
+  double tmp_num, tmp_den;
+  
+  // Cycle through received symbol
+  #pragma omp parallel for private(tmp_num,tmp_den,bj,k,j)
+  for(i=0; i<Ns; i++)
+  {
+    // Cycle through constellation bit
+    for(k=m-1; k>=0; k--)
+    {
+      // Initialize numerator and denominator of the logarithm
+      tmp_num = 0.0;
+      tmp_den = 0.0;
+      
+      // Numerator of the logarithm
+      for(j=0; j<M/2; j++)
+      {
+        bj = insert_zero(j, k, m);
+        tmp_num += exp(-pow(y[i]-C[bj],2.0)/(2*pow(s,2.0)));
+      }    
+      
+      // Denominator of the logarithm
+      for(j=0; j<M/2; j++)
+      {
+        bj = insert_zero(j, k, m) + (1<<k);
+        tmp_den += exp(-pow(y[i]-C[bj],2.0)/(2*pow(s,2.0)));
       }
       
       // Calculate LLR
