@@ -12,6 +12,7 @@
 #include <math.h>
 #include <complex.h>
 #include "capacity_functions.h"
+#include <omp.h>
 #include "mex.h"
 
 /* Gateway function */
