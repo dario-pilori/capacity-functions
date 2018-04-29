@@ -1,4 +1,4 @@
-#include "gausshermite_functions.h"
+#include "capacity_functions.h"
 
 // Gauss-Hermite parameters
 const double x[N_GH] = {-3.436159118837737603327,
@@ -246,7 +246,7 @@ void qam_soft_decode(const double complex *y, int Ns, const double complex *C, i
   int i, k, j, bj;
   double tmp_num, tmp_den;
   
-    // Cycle through received symbol
+  // Cycle through received symbol
   for(i=0; i<Ns; i++)
   {
     // Cycle through constellation bit
@@ -275,7 +275,3 @@ void qam_soft_decode(const double complex *y, int Ns, const double complex *C, i
     }      
   }
 }
-
-
-
-

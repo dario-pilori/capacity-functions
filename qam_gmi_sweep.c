@@ -9,7 +9,7 @@
 #include <complex.h>
 #include <string.h>
 #include <omp.h>
-#include "gausshermite_functions.h"
+#include "capacity_functions.h"
 #define MAX_M_QAM 1024
 #define CONST_DIR "/Documents/MATLAB/dsp-library/text_constellations/"
 

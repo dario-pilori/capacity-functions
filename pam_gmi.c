@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <math.h>
-#include "gausshermite_functions.h"
+#include "capacity_functions.h"
 #define M_PAM 4
 
 int main(int argc, char *argv[])

@@ -12,7 +12,7 @@
 #include <math.h>
 #include <complex.h>
 #include <omp.h>
-#include "gausshermite_functions.h"
+#include "capacity_functions.h"
 #include "mex.h"
 
 /* Gateway function */
