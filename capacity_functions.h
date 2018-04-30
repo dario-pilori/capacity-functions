@@ -4,6 +4,7 @@
 // Includes
 #include <math.h>
 #include <complex.h>
+#include <stdlib.h>
 
 // Definitions
 #define N_GH 10
@@ -21,7 +22,7 @@ unsigned int insert_zero(unsigned int i, unsigned int k, unsigned int nb);
 
 // Evaluation of AWGN and BMD(GMI) for PAM
 double pam_eval_mi(const double *C, int M, double s, const double *Pk);
-double pam_eval_gmi(const double *C, int M, double s);
+double pam_eval_gmi(const double *C, int M, double s, const double *Pk);
 
 // Evaluation of AWGN and BMD(GMI) for QAM
 double qam_eval_mi(const double complex *C, int M, double s);
