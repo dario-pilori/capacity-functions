@@ -3,7 +3,7 @@ MEX = mex
 CFLAGS = -O2 -fopenmp -fPIC
 LDFLAGS = -lm 
 
-all: qam_gmi_mex qam_llr_mex calculate_pbit_mex
+all: qam_gmi_mex qam_llr_mex calculate_pbit_mex qam_mi_montecarlo_mex
 
 calculate_pbit_mex:
 	$(MEX) CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)" -R2018a $< $@.c
@@ -15,6 +15,9 @@ qam_llr_mex: capacity_functions.o
 	$(MEX) CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)" -R2018a $< $@.c
 
 pam_llr_mex: capacity_functions.o
+	$(MEX) CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)" -R2018a $< $@.c
+
+qam_mi_montecarlo_mex: capacity_functions.o
 	$(MEX) CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)" -R2018a $< $@.c
 
 pam_gmi: pam_gmi.o capacity_functions.o
