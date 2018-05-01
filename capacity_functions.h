@@ -15,7 +15,7 @@ extern const double w[N_GH];
 
 // Evaluate symbol energy for PAM and QAM
 double symbol_energy(const double *C, const double *Pk, int M);
-double complex_symbol_energy(const double complex *C, int M);
+double complex_symbol_energy(const double complex *C, const double *Pk, int M);
 
 // Helper function: inserts a zero inside integer i at position k. i has at most nb bits.
 unsigned int insert_zero(unsigned int i, unsigned int k, unsigned int nb);
@@ -25,9 +25,10 @@ double pam_eval_mi(const double *C, int M, double s, const double *Pk);
 double pam_eval_gmi(const double *C, int M, double s, const double *Pk);
 
 // Evaluation of AWGN and BMD(GMI) for QAM
-double qam_eval_mi(const double complex *C, int M, double s);
-double qam_eval_gmi(const double complex *C, int M, double s);
+double qam_eval_mi(const double complex *C, int M, double s, const double *Pk);
+double qam_eval_gmi(const double complex *C, int M, double s, const double *Pk);
 
 // Evaluation of log-likelihood ratios for PAM and QAM
-void qam_soft_decode(const double complex *y, int Ns, const double complex *C, int M, double s, double *l);
+void qam_soft_decode(const double complex *y, int Ns, const double complex *C,
+        const double *Pk, int M, double s, double *l);
 void pam_soft_decode(const double *y, int Ns, const double *C, int M, double s, double *l);

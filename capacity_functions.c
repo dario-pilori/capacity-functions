@@ -55,16 +55,15 @@ unsigned int insert_zero(unsigned int i, unsigned int k, unsigned int nb)
 }
 
 // Helper function to calculate symbol energy
-double complex_symbol_energy(const double complex *C, int M)
+double complex_symbol_energy(const double complex *C, const double *Pk, int M)
 {
 	int i;
 	double Es = 0.0;
 	
 	for(i=0;i<M;i++)
 	{
-		Es += pow(cabs(C[i]),2.0);
+		Es += Pk[i]*pow(cabs(C[i]),2.0);
 	}	
-	Es /= M;
 	
 	return Es;
 }
@@ -98,7 +97,7 @@ double pam_eval_mi(const double *C, int M, double s, const double *Pk)
   return MI;
 }
 
-// Calculate BICM mutual information (GMI) for equiprobable PAM
+// Calculate BICM mutual information (GMI) for PAM
 double pam_eval_gmi(const double *C, int M, double s, const double *Pk)
 {
   // Variables
@@ -142,7 +141,7 @@ double pam_eval_gmi(const double *C, int M, double s, const double *Pk)
           // Numerator of the logarithm
           for(j=0; j<M; j++)
           {
-            tmp_num += Pk[j]*exp(-(pow(C[bi]-C[j],2.0) - sqrt(8.0)*x[l]*s*(C[bi]-C[j]))/(2*pow(s,2.0)));
+            tmp_num += exp(-(pow(C[bi]-C[j],2.0) - sqrt(8.0)*x[l]*s*(C[bi]-C[j]))/(2*pow(s,2.0)))*Pk[j];
           }
         
           // Denominator of the logarithm
@@ -180,15 +179,18 @@ double pam_eval_gmi(const double *C, int M, double s, const double *Pk)
     GMI += Pb0[k]*log2(Pb0[k]);
     GMI += (1-Pb0[k])*log2(1-Pb0[k]);
   }
-  
-  
   // Free memory and return
   free(Pb0);
+
+  // Sanity check
+  if(GMI < 0)
+    GMI = 0.0;
+  
   return GMI;
 }
 
 // Calculate AWGN mutual information for PAM
-double qam_eval_mi(const double complex *C, int M, double s)
+double qam_eval_mi(const double complex *C, int M, double s, const double *Pk)
 {
   double MI = 0;
   double tmp;
@@ -209,30 +211,42 @@ double qam_eval_mi(const double complex *C, int M, double s)
          for(j=0; j<M; j++)
          {
            tmp += exp(-( pow(cabs(C[j]-C[i]),2.0) - 
-                  2*s*creal((x[l1]+I*x[l2])*(C[j]-C[i])) )/pow(s,2.0));
+                  2*s*creal((x[l1]+I*x[l2])*(C[j]-C[i])) )/pow(s,2.0))*Pk[j];
          }
        
-         MI -= w[l1]*w[l2]*log2(tmp);
+         MI -= w[l1]*w[l2]*log2(tmp)*Pk[i];
        }
      }
   }
   
   // Prepare output
-  MI /= M*M_PI;
-  MI += m;
+  MI /= M_PI;
   
   return MI;
 }
 
-// Calculate BICM mutual information (GMI) for equiprobable PAM
-double qam_eval_gmi(const double complex *C, int M, double s)
+// Calculate BICM mutual information (GMI) for QAM
+double qam_eval_gmi(const double complex *C, int M, double s, const double *Pk)
 {
   const int m = log2(M);
   
   int i, l1, l2, j, k, b;
   int bi, bj;
-  double GMI = 0;
+  double GMI = 0.0;
   double tmp_num, tmp_den;
+  double *Pb0;
+  
+  // Calculate bit-wise probabilities
+  Pb0 = malloc(sizeof(double)*m);
+  for(k=0; k<m; k++)
+  {
+    Pb0[k] = 0.0;
+    for(j=0; j<M/2; j++)
+    {
+      bj = insert_zero(j, k, m);
+      Pb0[k] += Pk[bj];
+    }
+  }   
 
   // Cycle through constellation bit
   for(k=0; k<m; k++)
@@ -258,7 +272,7 @@ double qam_eval_gmi(const double complex *C, int M, double s)
             for(j=0; j<M; j++)
             {
               tmp_num += exp(-(pow(cabs(C[bi]-C[j]),2.0) - 
-              	         2*s*creal((x[l1]+I*x[l2])*(C[bi]-C[j])))/pow(s,2.0));
+              	         2*s*creal((x[l1]+I*x[l2])*(C[bi]-C[j])))/pow(s,2.0))*Pk[j];
             }
         
             // Denominator of the logarithm
@@ -266,11 +280,18 @@ double qam_eval_gmi(const double complex *C, int M, double s)
             {
               bj = insert_zero(j, k, m) + (b<<k);
               tmp_den += exp(-(pow(cabs(C[bi]-C[bj]),2.0) - 
-              	         2*s*creal((x[l1]+I*x[l2])*(C[bi]-C[bj])))/pow(s,2.0));
+              	         2*s*creal((x[l1]+I*x[l2])*(C[bi]-C[bj])))/pow(s,2.0))*Pk[bj];
             }
        
-            // Evaluate GMI
-            GMI -= w[l1]*w[l2]*log2(tmp_num/tmp_den);
+          // Apply bit probability
+          if(b)
+            tmp_den /= 1-Pb0[k];
+          else
+            tmp_den /= Pb0[k];
+            
+          // Evaluate GMI
+          GMI -= w[l1]*w[l2]*log2(tmp_num/tmp_den)*Pk[bi];
+          
           }
         } 
       }
@@ -278,14 +299,34 @@ double qam_eval_gmi(const double complex *C, int M, double s)
   }
   
   // Prepare output
-  GMI /= M*M_PI;
-  GMI += m;
+  GMI /= M_PI;
+  
+  // Add entropy of constellation
+  for(j=0; j<M; j++)
+  {
+    GMI -= Pk[j]*log2(Pk[j]);
+  }
+  
+  // Remove entropy of each bit
+  for(k=0; k<m; k++)
+  {
+    GMI += Pb0[k]*log2(Pb0[k]);
+    GMI += (1-Pb0[k])*log2(1-Pb0[k]);
+  }  
+  
+  // Free memory
+  free(Pb0);
+  
+  // Sanity check if GMI is negative
+  if(GMI < 0)
+    GMI = 0.0;
   
   return GMI;
 }
 
 // Calculate log-likelihood ratios (LLRs) for equiprobable QAM
-void qam_soft_decode(const double complex *y, int Ns, const double complex *C, int M, double s, double *l)
+void qam_soft_decode(const double complex *y, int Ns, const double complex *C,
+        const double *Pk, int M, double s, double *l)
 {
   const int m = log2(M);
   int i, k, j, bj;
@@ -306,20 +347,20 @@ void qam_soft_decode(const double complex *y, int Ns, const double complex *C, i
       for(j=0; j<M/2; j++)
       {
         bj = insert_zero(j, k, m);
-        tmp_num += exp(-pow(cabs(y[i]-C[bj]),2.0)/pow(s,2.0));
-      }    
+        tmp_num += exp(-pow(cabs(y[i]-C[bj]),2.0)/pow(s,2.0))*Pk[bj];
+      }
       
       // Denominator of the logarithm
       for(j=0; j<M/2; j++)
       {
         bj = insert_zero(j, k, m) + (1<<k);
-        tmp_den += exp(-pow(cabs(y[i]-C[bj]),2.0)/pow(s,2.0));
+        tmp_den += exp(-pow(cabs(y[i]-C[bj]),2.0)/pow(s,2.0))*Pk[bj];
       }
       
       // Calculate LLR
       l[i*m + k] = log(tmp_num/tmp_den);
     }      
-  }
+  } 
 }
 
 // Calculate log-likelihood ratios (LLRs) for equiprobable PAM

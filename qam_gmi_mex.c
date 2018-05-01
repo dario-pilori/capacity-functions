@@ -1,11 +1,17 @@
 /*
  * qam_gmi_mex.c - Compute MI and GMI for QAM
+ * 
+ * Usage: qam_gmi_mex(C, SNR, Pk)
+ * C    :=   Complex constellation in Gray-mapping order
+ * SNR  :=   Vector of SNR (Es/No, dB)
+ * Pk   :=   Probability of each constellation symbol
  *
  * Use this function to compute MI and GMI for M-QAM
- * constellations.
+ * constellations in an AWGN channel using Gauss-Hermite quadrature.
  *
  * Compile with: mex -lm -R2018a CFLAGS="$CFLAGS -fopenmp" LDFLAGS="$LDFLAGS -fopenmp" qam_gmi_mex.c
  * (requires MATLAB R2018a or newer versions)
+ * Works under 64-bit Linux. Don't know/care under other OS.
  *
  * 2018 - Dario Pilori <dario.pilori@polito.it>
  */
@@ -20,20 +26,20 @@ void mexFunction(int nlhs, mxArray *plhs[],
         int nrhs, const mxArray *prhs[])
 {
     size_t M, N;                   /* constellation and SNR size */
-    int i;                        /* loop index */
+    int i;                         /* loop index */
     double complex *C;
-    double *mi, *gmi, *snr;
+    double *mi, *gmi, *snr, *Pk;
     double Es, sigma;
     
     /* Verify input */
-    if(nrhs != 2) {
-        mexErrMsgIdAndTxt("dsp-library:qam_gmi_mex:nrhs",
-                "Two inputs required.");
+    if(nrhs != 3) {
+        mexErrMsgIdAndTxt("DspLibrary:qam_gmi_mex:nrhs",
+                "Three inputs required.");
     }
     
     /* Verify output */
     if(nlhs > 2) {
-        mexErrMsgIdAndTxt("dsp-library:qam_gmi_mex:nlhs",
+        mexErrMsgIdAndTxt("DspLibrary:qam_gmi_mex:nlhs",
                 "Max two outputs.");
     }
     
@@ -42,8 +48,9 @@ void mexFunction(int nlhs, mxArray *plhs[],
     N = mxGetM(prhs[1]);
         
     /* Get pointers */
-    snr = mxGetPr(prhs[1]);
+    snr = mxGetDoubles(prhs[1]);
     C = (double complex *) mxGetComplexDoubles(prhs[0]);
+    Pk = mxGetDoubles(prhs[2]);
     
     /* create the output matrices */
     plhs[0] = mxCreateDoubleMatrix((mwSize)N,1,mxREAL);
@@ -54,14 +61,14 @@ void mexFunction(int nlhs, mxArray *plhs[],
     gmi = mxGetDoubles(plhs[1]);
     
     /* Calculate symbol energy */
-    Es = complex_symbol_energy(C, M);
+    Es = complex_symbol_energy(C, Pk, M);
     
     /* Call functions */
     #pragma omp parallel for private(sigma)
     for(i=0; i<N; i++) {
         sigma = sqrt(Es) * pow(10,-snr[i]/20);
-        mi[i] = qam_eval_mi(C, M, sigma);
-        gmi[i] = qam_eval_gmi(C, M, sigma);
+        mi[i] = qam_eval_mi(C, M, sigma, Pk);
+        gmi[i] = qam_eval_gmi(C, M, sigma, Pk);
     }
 }
 
