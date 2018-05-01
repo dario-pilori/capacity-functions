@@ -100,6 +100,44 @@ double pam_eval_mi(const double *C, int M, double s, const double *Pk)
   return MI;
 }
 
+/*
+ * Calculate AWGN mutual information (MI) for PAM using MonteCarlo
+ * integration assuming an AWGN channel.
+ */
+double pam_montecarlo_mi(const double *y, int Ns, const double *C,
+        const double *Pk, int M, double s2)
+{
+    double MI = 0;
+    double tmp;
+    int i, l, j;
+    const unsigned int m = log2(M);
+    
+    // For each received symbol
+    #pragma omp parallel for private(tmp,i,j)
+    for(l=0; l<Ns; l++)
+    {
+        // Cycle through constellation point
+        for(i=0; i<M; i++)
+        {
+            tmp = 0.0;
+            
+            // Cycle through constellation point for the logarithm
+            for(j=0; j<M; j++)
+            {
+                tmp += exp(-(pow(C[j]-C[i],2.0) +
+                        2*y[l]*(C[j]-C[i]))/(2*s2))*Pk[j];
+            }
+            
+            MI -= log2(tmp)*Pk[i];
+        }
+    }
+    
+    // Prepare output
+    MI /= Ns;
+    
+    return MI;
+}
+
 
 /* 
  * Calculate BICM mutual information (GMI) for PAM using Gauss-Hermite 
@@ -272,7 +310,6 @@ double qam_montecarlo_mi(const double complex *y, int Ns, const double complex *
     
     return MI;
 }
-
 
 /* 
  * Calculate BICM mutual information (GMI) for QAM using Gauss-Hermite 
