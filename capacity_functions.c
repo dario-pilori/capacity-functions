@@ -42,7 +42,7 @@ double symbol_energy(const double *C, const double *Pk, int M)
 	return Es;
 }
 
-// Helper function to insert a zero inside a number
+// Helper function to insert a zero at position k of number i with nb bits
 unsigned int insert_zero(unsigned int i, unsigned int k, unsigned int nb)
 {
   unsigned int b0, left, right;
@@ -68,7 +68,10 @@ double complex_symbol_energy(const double complex *C, const double *Pk, int M)
 	return Es;
 }
 
-// Calculate AWGN mutual information for PAM
+/* 
+ * Calculate AWGN mutual information (MI) for PAM using Gauss-Hermite 
+ * qadrature assuming an AWGN channel.
+ */
 double pam_eval_mi(const double *C, int M, double s, const double *Pk)
 {
   double MI = 0.0;
@@ -97,7 +100,10 @@ double pam_eval_mi(const double *C, int M, double s, const double *Pk)
   return MI;
 }
 
-// Calculate BICM mutual information (GMI) for PAM
+/* 
+ * Calculate BICM mutual information (GMI) for PAM using Gauss-Hermite 
+ * qadrature assuming an AWGN channel.
+ */
 double pam_eval_gmi(const double *C, int M, double s, const double *Pk)
 {
   // Variables
@@ -189,7 +195,10 @@ double pam_eval_gmi(const double *C, int M, double s, const double *Pk)
   return GMI;
 }
 
-// Calculate AWGN mutual information for PAM
+/* 
+ * Calculate AWGN mutual information (MI) for QAM using Gauss-Hermite 
+ * qadrature assuming an AWGN channel.
+ */
 double qam_eval_mi(const double complex *C, int M, double s, const double *Pk)
 {
   double MI = 0;
@@ -225,7 +234,10 @@ double qam_eval_mi(const double complex *C, int M, double s, const double *Pk)
   return MI;
 }
 
-// Calculate BICM mutual information (GMI) for QAM
+/* 
+ * Calculate BICM mutual information (GMI) for QAM using Gauss-Hermite 
+ * qadrature assuming an AWGN channel.
+ */
 double qam_eval_gmi(const double complex *C, int M, double s, const double *Pk)
 {
   const int m = log2(M);
@@ -324,9 +336,11 @@ double qam_eval_gmi(const double complex *C, int M, double s, const double *Pk)
   return GMI;
 }
 
-// Calculate log-likelihood ratios (LLRs) for equiprobable QAM
+/* 
+ * Calculate Log-Likelihood Ratios (LLRs) for QAM assuming a BICM-AWGN channel.
+ */
 void qam_soft_decode(const double complex *y, int Ns, const double complex *C,
-        const double *Pk, int M, double s, double *l)
+        const double *Pk, int M, const double *s2, double *l)
 {
   const int m = log2(M);
   int i, k, j, bj;
@@ -347,14 +361,14 @@ void qam_soft_decode(const double complex *y, int Ns, const double complex *C,
       for(j=0; j<M/2; j++)
       {
         bj = insert_zero(j, k, m);
-        tmp_num += exp(-pow(cabs(y[i]-C[bj]),2.0)/pow(s,2.0))*Pk[bj];
+        tmp_num += exp(-pow(cabs(y[i]-C[bj]),2.0)/s2[bj])*Pk[bj];
       }
       
       // Denominator of the logarithm
       for(j=0; j<M/2; j++)
       {
         bj = insert_zero(j, k, m) + (1<<k);
-        tmp_den += exp(-pow(cabs(y[i]-C[bj]),2.0)/pow(s,2.0))*Pk[bj];
+        tmp_den += exp(-pow(cabs(y[i]-C[bj]),2.0)/s2[bj])*Pk[bj];
       }
       
       // Calculate LLR
@@ -363,8 +377,11 @@ void qam_soft_decode(const double complex *y, int Ns, const double complex *C,
   } 
 }
 
-// Calculate log-likelihood ratios (LLRs) for equiprobable PAM
-void pam_soft_decode(const double *y, int Ns, const double *C, int M, double s, double *l)
+/* 
+ * Calculate Log-Likelihood Ratios (LLRs) for QAM assuming a BICM-AWGN channel.
+ */
+void pam_soft_decode(const double *y, int Ns, const double *C, 
+        const double *Pk, int M, const double *s2, double *l)
 {
   const int m = log2(M);
   int i, k, j, bj;
@@ -385,14 +402,14 @@ void pam_soft_decode(const double *y, int Ns, const double *C, int M, double s, 
       for(j=0; j<M/2; j++)
       {
         bj = insert_zero(j, k, m);
-        tmp_num += exp(-pow(y[i]-C[bj],2.0)/(2*pow(s,2.0)));
+        tmp_num += exp(-pow(y[i]-C[bj],2.0)/(2*s2[bj]))*Pk[bj];
       }    
       
       // Denominator of the logarithm
       for(j=0; j<M/2; j++)
       {
         bj = insert_zero(j, k, m) + (1<<k);
-        tmp_den += exp(-pow(y[i]-C[bj],2.0)/(2*pow(s,2.0)));
+        tmp_den += exp(-pow(y[i]-C[bj],2.0)/(2*s2[bj]))*Pk[bj];
       }
       
       // Calculate LLR
@@ -400,4 +417,3 @@ void pam_soft_decode(const double *y, int Ns, const double *C, int M, double s, 
     }      
   }
 }
-

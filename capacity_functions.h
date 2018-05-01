@@ -30,5 +30,6 @@ double qam_eval_gmi(const double complex *C, int M, double s, const double *Pk);
 
 // Evaluation of log-likelihood ratios for PAM and QAM
 void qam_soft_decode(const double complex *y, int Ns, const double complex *C,
-        const double *Pk, int M, double s, double *l);
-void pam_soft_decode(const double *y, int Ns, const double *C, int M, double s, double *l);
+        const double *Pk, int M, const double *s2, double *l);
+void pam_soft_decode(const double *y, int Ns, const double *C, 
+        const double *Pk, int M, const double *s2, double *l);

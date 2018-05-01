@@ -1,11 +1,11 @@
 /*
  * qam_llr_mex.c - Compute LLRs for QAM
  *
- * Usage: qam_llr_mex(C, SNR, y, Pk)
- * C    :=   Complex constellation in Gray-mapping order
- * SNR  :=   Vector of SNR (Es/No, dB)
- * y    :=   Received complex symbols
- * Pk   :=   Probability of each constellation symbol
+ * Usage: qam_llr_mex(C, sigma2, y, Pk)
+ * C     :=   Complex constellation in Gray-mapping order
+ * sigma2:=   Noise variance per each constellation point
+ * y     :=   Received complex symbols
+ * Pk    :=   Probability of each constellation symbol
  *
  * Use this function to compute log-likelihood-ratios
  * for M-QAM constellations.
@@ -18,8 +18,8 @@
  */
 #include <math.h>
 #include <complex.h>
-#include "capacity_functions.h"
 #include <omp.h>
+#include "capacity_functions.h"
 #include "mex.h"
 
 /* Gateway function */
@@ -28,8 +28,7 @@ void mexFunction(int nlhs, mxArray *plhs[],
 {
     size_t M, Ns;                   /* constellation and data size */
     double complex *C, *y;          /* Data and constellation */
-    double *l, *Pk;                 
-    double snr, Es, sigma;
+    double *l, *Pk, *s2;                 
     
     /* Verify input */
     if(nrhs != 4) {
@@ -47,12 +46,14 @@ void mexFunction(int nlhs, mxArray *plhs[],
     M = mxGetM(prhs[0]);
     Ns = mxGetM(prhs[2]);
     
-    /* Get SNR */
-    snr = mxGetScalar(prhs[1]);
+    /* Get noise variance */
+    s2 = mxGetDoubles(prhs[1]);
         
-    /* Get constellation, received data and probabilities */
+    /* Get constellation and received data */
     C = (double complex *) mxGetComplexDoubles(prhs[0]);
     y = (double complex *) mxGetComplexDoubles(prhs[2]);
+    
+    /* Get probabilities */
     Pk = mxGetDoubles(prhs[3]);
     
     /* Allocate the output matrix */
@@ -60,12 +61,7 @@ void mexFunction(int nlhs, mxArray *plhs[],
     
     /* get a pointer to the output matrix */
     l = mxGetDoubles(plhs[0]);
-    
-    /* Calculate symbol energy */
-    Es = complex_symbol_energy(C, Pk, M);
-    
+        
     /* Call function */
-    sigma = sqrt(Es) * pow(10,-snr/20);
-    qam_soft_decode(y, Ns, C, Pk, M, sigma, l);
+    qam_soft_decode(y, Ns, C, Pk, M, s2, l);
 }
-
