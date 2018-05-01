@@ -286,7 +286,7 @@ double qam_montecarlo_mi(const double complex *y, int Ns, const double complex *
     const unsigned int m = log2(M);
     
     // For each received symbol
-    #pragma omp parallel for private(tmp,i,j)
+    #pragma omp parallel for private(tmp,i,j) reduction(-:MI)
     for(l=0; l<Ns; l++)
     {
         // Cycle through constellation point
