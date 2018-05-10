@@ -1,22 +1,23 @@
 /*
  * qam_llr_mex.c - Compute LLRs for QAM
  *
- * Usage: qam_llr_mex(C, sigma2, y, Pk)
+ * Usage: qam_llr_pn_mex(C, Kn, Kp, B0, y, Pk)
  * C     :=   Complex constellation in Gray-mapping order
- * sigma2:=   Noise variance per each constellation point
+ * Kn    :=   1/Noise variance
+ * Kp    :=   ~ 1/Phase noise variance
+ * B0    :=   Kn/Io(Kp)/4/pi^2
  * y     :=   Received complex symbols
  * Pk    :=   Probability of each constellation symbol
  *
  * Use this function to compute log-likelihood-ratios
  * for M-QAM constellations.
  *
- * Compile with: mex -lm -R2018a qam_llr_mex.c
+ * Compile with: mex -lgsl -lgslcblas -lm -R2018a qam_llr_pn_mex.c
  * (requires MATLAB R2018a or newer versions)
  * Works under 64-bit Linux. Don't know/care under other OSs.
  *
  * 2018 - Dario Pilori <dario.pilori@polito.it>
  */
-#include <math.h>
 #include <complex.h>
 #include <omp.h>
 #include "capacity_functions.h"
@@ -28,12 +29,13 @@ void mexFunction(int nlhs, mxArray *plhs[],
 {
     size_t M, Ns;                   /* constellation and data size */
     double complex *C, *y;          /* Data and constellation */
-    double *l, *Pk, *s2;                 
+    double *l, *Pk;                 
+    double Kn, Kp, B0;
     
     /* Verify input */
-    if(nrhs != 4) {
+    if(nrhs != 6) {
         mexErrMsgIdAndTxt("DspLibrary:qam_gmi_mex:nrhs",
-                "Four inputs required.");
+                "Five inputs required.");
     }
     
     /* Verify output */
@@ -44,23 +46,25 @@ void mexFunction(int nlhs, mxArray *plhs[],
     
     /* Get sizes */
     M = mxGetM(prhs[0]);
-    Ns = mxGetM(prhs[2]);
+    Ns = mxGetM(prhs[4]);
     
     /* Verify sizes */
-    if ((mxGetM(prhs[1])!=M)||(mxGetM(prhs[3])!=M)) {
+    if (mxGetM(prhs[5])!=M) {
         mexErrMsgIdAndTxt("DspLibrary:qam_gmi_mex:sizes",
-                "Probabilities and variances must have same size as constellation.");
+                "Probabilities must have same size as constellation.");
     }
     
-    /* Get noise variance */
-    s2 = mxGetDoubles(prhs[1]);
+    /* Get noise variances */
+    Kn = mxGetScalar(prhs[1]);
+    Kp = mxGetScalar(prhs[2]);
+    B0 = mxGetScalar(prhs[3]);
         
     /* Get constellation and received data */
     C = (double complex *) mxGetComplexDoubles(prhs[0]);
-    y = (double complex *) mxGetComplexDoubles(prhs[2]);
+    y = (double complex *) mxGetComplexDoubles(prhs[4]);
     
     /* Get probabilities */
-    Pk = mxGetDoubles(prhs[3]);
+    Pk = mxGetDoubles(prhs[5]);
     
     /* Allocate the output matrix */
     plhs[0] = mxCreateDoubleMatrix((mwSize) (Ns*log2(M)),1,mxREAL);
@@ -69,5 +73,5 @@ void mexFunction(int nlhs, mxArray *plhs[],
     l = mxGetDoubles(plhs[0]);
         
     /* Call function */
-    qam_soft_decode(y, Ns, C, Pk, M, s2, l);
+    qam_soft_decode_pn(y, Ns, C, Pk, M, Kn, Kp, B0, l);
 }

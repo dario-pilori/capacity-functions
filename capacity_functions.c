@@ -68,6 +68,15 @@ double complex_symbol_energy(const double complex *C, const double *Pk, int M)
 	return Es;
 }
 
+// Helper function to evaluate log(sum(exp(.))) in a safe way
+void maxxx(double *a, double b)
+{
+    if(*a>b)
+        *a += log(1.0 + exp(b-*a));
+    else
+        *a = b + log(1.0 + exp(*a-b));       
+}
+
 /* 
  * Calculate AWGN mutual information (MI) for PAM using Gauss-Hermite 
  * qadrature assuming an AWGN channel.
@@ -451,11 +460,11 @@ void qam_soft_decode(const double complex *y, int Ns, const double complex *C,
       // Calculate LLR
       l[i*m + k] = log(tmp_num/tmp_den);
     }      
-  } 
+  }
 }
 
 /* 
- * Calculate Log-Likelihood Ratios (LLRs) for QAM assuming a BICM-AWGN channel.
+ * Calculate Log-Likelihood Ratios (LLRs) for PAM assuming a BICM-AWGN channel.
  */
 void pam_soft_decode(const double *y, int Ns, const double *C, 
         const double *Pk, int M, const double *s2, double *l)
@@ -493,4 +502,56 @@ void pam_soft_decode(const double *y, int Ns, const double *C,
       l[i*m + k] = log(tmp_num/tmp_den);
     }      
   }
+}
+
+
+/* 
+ * Calculate Log-Likelihood Ratios (LLRs) for QAM assuming a BICM-AWGN channel
+ * with phase noise.
+ */
+void qam_soft_decode_pn(const double complex *y, int Ns, const double complex *C,
+        const double *Pk, int M, double Kn, double Kp, double B0, double *l)
+{
+    const int m = log2(M);
+    int i, k, j, bj;
+    double tmp_num, tmp_den;
+    double alpha, beta, B;
+        
+    // Cycle through received symbol
+    #pragma omp parallel for private(tmp_num,tmp_den,bj,k,j,alpha,beta,B)
+    for(i=0; i<Ns; i++)
+    {
+        // Cycle through constellation bit
+        for(k=m-1; k>=0; k--)
+        {
+            // Initialize numerator and denominator of the logarithm
+            tmp_num = 0.0;
+            tmp_den = 0.0;
+            
+            // Numerator of the logarithm
+            for(j=0; j<M/2; j++)
+            {
+                bj = insert_zero(j, k, m);                
+                alpha = Kp + Kn*creal(conj(y[i])*C[bj]);
+                beta = -Kn*cimag(conj(y[i])*C[bj]);
+                B = B0*exp(-Kn/2*(pow(cabs(y[i]),2)+pow(cabs(C[bj]),2)));
+                
+                tmp_num += B*exp(sqrt(pow(alpha,2)+pow(beta,2)))*Pk[bj];
+            }
+            
+            // Denominator of the logarithm
+            for(j=0; j<M/2; j++)
+            {
+                bj = insert_zero(j, k, m) + (1<<k);
+                alpha = Kp + Kn*creal(conj(y[i])*C[bj]);
+                beta = -Kn*cimag(conj(y[i])*C[bj]);
+                B = B0*exp(-Kn/2*(pow(cabs(y[i]),2)+pow(cabs(C[bj]),2)));
+                
+                tmp_den += B*exp(sqrt(pow(alpha,2)+pow(beta,2)))*Pk[bj];
+            }
+            
+            // Calculate LLR
+            l[i*m + k] = log(tmp_num)-log(tmp_den);
+        }
+    }
 }

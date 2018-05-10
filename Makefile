@@ -1,9 +1,12 @@
 CC = gcc
 MEX = mex
 CFLAGS = -O2 -fopenmp -fPIC
-LDFLAGS = -lm 
+LDFLAGS = -lm
 
-all: qam_gmi_mex qam_llr_mex calculate_pbit_mex qam_mi_montecarlo_mex pam_mi_montecarlo_mex
+all: qam_gmi_mex qam_llr_mex calculate_pbit_mex qam_mi_montecarlo_mex pam_mi_montecarlo_mex qam_llr_pn_mex
+
+qam_llr_pn_mex: capacity_functions.o
+	$(MEX) CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)" -R2018a $< $@.c
 
 calculate_pbit_mex:
 	$(MEX) CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)" -R2018a $< $@.c
