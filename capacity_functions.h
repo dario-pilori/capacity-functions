@@ -41,6 +41,8 @@ void pam_soft_decode(const double *y, int Ns, const double *C,
 // Evaluation of log-likelihood ratios for QAM with phase noise
 void qam_soft_decode_pn(const double complex *y, int Ns, const double complex *C,
         const double *Pk, int M, double Kn, double Kp, double B0, double *l);
+void qam_soft_decode_pn_maxlog(const double complex *y, int Ns, const double complex *C,
+        const double *Pk, int M, double Kn, double Kp, double *l);
 
 // Monte-Carlo evaluation of AWGN MI
 double qam_montecarlo_mi(const double complex *y, int Ns, const double complex *C,

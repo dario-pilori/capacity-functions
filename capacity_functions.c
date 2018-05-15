@@ -555,3 +555,63 @@ void qam_soft_decode_pn(const double complex *y, int Ns, const double complex *C
         }
     }
 }
+
+/* 
+ * Calculate Log-Likelihood Ratios (LLRs) for QAM assuming a BICM-AWGN channel
+ * with phase noise. This function uses the max-log approximation
+ */
+void qam_soft_decode_pn_maxlog(const double complex *y, int Ns, const double complex *C,
+        const double *Pk, int M, double Kn, double Kp, double *l)
+{
+    const int m = log2(M);
+    int i, k, j, bj;
+    double tmp_num, tmp_den, max_num, max_den;
+    double alpha, beta;
+        
+    // Cycle through received symbol
+    #pragma omp parallel for private(tmp_num,tmp_den,bj,k,j,alpha,beta,max_num,max_den)
+    for(i=0; i<Ns; i++)
+    {
+        // Cycle through constellation bit
+        for(k=m-1; k>=0; k--)
+        {
+            // Initialize numerator and denominator of the logarithm
+            max_num = 0.0;
+            max_den = 0.0;
+            
+            // Numerator of the logarithm
+            for(j=0; j<M/2; j++)
+            {
+                bj = insert_zero(j, k, m);                
+                alpha = Kp + Kn*creal(conj(y[i])*C[bj]);
+                beta = -Kn*cimag(conj(y[i])*C[bj]);
+                
+                tmp_num = -pow(cabs(C[bj]),2)*Kn/2 +
+                        sqrt(pow(alpha,2)+pow(beta,2)) + 
+                        log(Pk[bj]);
+                
+                if(tmp_num>max_num)
+                    max_num = tmp_num;
+            }
+            
+            // Denominator of the logarithm
+            for(j=0; j<M/2; j++)
+            {
+                bj = insert_zero(j, k, m) + (1<<k);
+                alpha = Kp + Kn*creal(conj(y[i])*C[bj]);
+                beta = -Kn*cimag(conj(y[i])*C[bj]);
+                
+                tmp_den = -pow(cabs(C[bj]),2)*Kn/2 +
+                        sqrt(pow(alpha,2)+pow(beta,2)) +
+                        log(Pk[bj]);
+                
+                if(tmp_den>max_den)
+                    max_den = tmp_den;
+            }
+            
+            // Calculate LLR
+            l[i*m + k] = max_num-max_den;
+        }
+    }
+}
+
