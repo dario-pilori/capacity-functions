@@ -510,15 +510,17 @@ void pam_soft_decode(const double *y, int Ns, const double *C,
  * with phase noise.
  */
 void qam_soft_decode_pn(const double complex *y, int Ns, const double complex *C,
-        const double *Pk, int M, double Kn, double Kp, double B0, double *l)
+        const double *Pk, int M, double Kn, double Kp, double *l)
 {
     const int m = log2(M);
     int i, k, j, bj;
-    double tmp_num, tmp_den;
-    double alpha, beta, B;
+    double tmp_num, tmp_den, B0, B;
+    
+    // Calculate common term
+    B0 = sqrt(Kp/8/pow(M_PI,3))*Kn*exp(-Kp);
         
     // Cycle through received symbol
-    #pragma omp parallel for private(tmp_num,tmp_den,bj,k,j,alpha,beta,B)
+    #pragma omp parallel for private(tmp_num,tmp_den,bj,k,j,B)
     for(i=0; i<Ns; i++)
     {
         // Cycle through constellation bit
@@ -532,22 +534,18 @@ void qam_soft_decode_pn(const double complex *y, int Ns, const double complex *C
             for(j=0; j<M/2; j++)
             {
                 bj = insert_zero(j, k, m);                
-                alpha = Kp + Kn*creal(conj(y[i])*C[bj]);
-                beta = -Kn*cimag(conj(y[i])*C[bj]);
                 B = B0*exp(-Kn/2*(pow(cabs(y[i]),2)+pow(cabs(C[bj]),2)));
                 
-                tmp_num += B*exp(sqrt(pow(alpha,2)+pow(beta,2)))*Pk[bj];
+                tmp_num += B*exp(cabs(conj(y[i])*C[bj]*Kn+Kp))*Pk[bj];
             }
             
             // Denominator of the logarithm
             for(j=0; j<M/2; j++)
             {
                 bj = insert_zero(j, k, m) + (1<<k);
-                alpha = Kp + Kn*creal(conj(y[i])*C[bj]);
-                beta = -Kn*cimag(conj(y[i])*C[bj]);
                 B = B0*exp(-Kn/2*(pow(cabs(y[i]),2)+pow(cabs(C[bj]),2)));
                 
-                tmp_den += B*exp(sqrt(pow(alpha,2)+pow(beta,2)))*Pk[bj];
+                tmp_den += B*exp(cabs(conj(y[i])*C[bj]*Kn+Kp))*Pk[bj];
             }
             
             // Calculate LLR

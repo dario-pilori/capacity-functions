@@ -1,7 +1,7 @@
 /*
- * qam_llr_maxlog_mex.c - Compute LLRs for QAM
+ * qam_llr_pn_maxlog_mex.c - Compute LLRs for QAM
  *
- * Usage: qam_llr_maxlog_mex(C, Kn, Kp, y, Pk)
+ * Usage: qam_llr_pn_maxlog_mex(C, Kn, Kp, y, Pk)
  * C     :=   Complex constellation in Gray-mapping order
  * Kn    :=   1/Noise variance
  * Kp    :=   ~ 1/Phase noise variance
