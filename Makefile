@@ -1,8 +1,8 @@
 CC = gcc
 MEX = mex
 CFLAGS = -O2 -fopenmp -march=native
-MEX_CFLAGS = -O2 -fopenmp -fPIC
-LDFLAGS = -lm
+MEX_CFLAGS = -O2 -fopenmp -fPIC -march=native
+LDFLAGS = -lm -fopenmp
 
 all: qam_gmi_mex qam_llr_mex calculate_pbit_mex qam_mi_montecarlo_mex pam_mi_montecarlo_mex qam_llr_pn_mex qam_llr_pn_maxlog_mex
 
