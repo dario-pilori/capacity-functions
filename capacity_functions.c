@@ -4,6 +4,11 @@
 *
 * 2018 - Dario Pilori <dario.pilori@polito.it>
 */
+// Includes
+#include <math.h>
+#include <complex.h>
+#include <stdlib.h>
+#include <stdio.h>
 #include "capacity_functions.h"
 
 // Gauss-Hermite parameters

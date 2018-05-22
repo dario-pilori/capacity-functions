@@ -1,15 +1,13 @@
 /*
 * Header for capacity_functions.h
 */
-// Includes
-#include <math.h>
-#include <complex.h>
-#include <stdlib.h>
-#include <stdio.h>
 
 // Include guard
 #ifndef CAPACITY_FUNCTIONS_H
 #define CAPACITY_FUNCTIONS_H
+
+// Complex numbers
+#include <complex.h>
 
 // Definitions
 #define N_GH 10

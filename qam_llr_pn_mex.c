@@ -20,6 +20,7 @@
  */
 #include <complex.h>
 #include <omp.h>
+#include <math.h>
 #include "capacity_functions.h"
 #include "mex.h"
 
