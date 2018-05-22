@@ -7,6 +7,10 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+// Include guard
+#ifndef CAPACITY_FUNCTIONS_H
+#define CAPACITY_FUNCTIONS_H
+
 // Definitions
 #define N_GH 10
 
@@ -49,3 +53,5 @@ double qam_montecarlo_mi(const double complex *y, int Ns, const double complex *
         const double *Pk, int M, double s2);
 double pam_montecarlo_mi(const double *y, int Ns, const double *C,
         const double *Pk, int M, double s2);
+
+#endif /* CAPACITY_FUNCTIONS_H */

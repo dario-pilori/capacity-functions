@@ -514,15 +514,12 @@ void qam_soft_decode_pn(const double complex *y, int Ns, const double complex *C
 {
     const int m = log2(M);
     int i, k, j, bj;
-    double tmp_num, tmp_den, B0, B;
-    
-    // Calculate common term
-    B0 = sqrt(Kp/8/pow(M_PI,3))*Kn*exp(-Kp);
-        
+    double tmp_num, tmp_den;
+            
     // Cycle through received symbol
-    #pragma omp parallel for private(tmp_num,tmp_den,bj,k,j,B)
+    #pragma omp parallel for private(tmp_num,tmp_den,bj,k,j)
     for(i=0; i<Ns; i++)
-    {
+    {        
         // Cycle through constellation bit
         for(k=m-1; k>=0; k--)
         {
@@ -534,18 +531,18 @@ void qam_soft_decode_pn(const double complex *y, int Ns, const double complex *C
             for(j=0; j<M/2; j++)
             {
                 bj = insert_zero(j, k, m);                
-                B = B0*exp(-Kn/2*(pow(cabs(y[i]),2)+pow(cabs(C[bj]),2)));
                 
-                tmp_num += B*exp(cabs(conj(y[i])*C[bj]*Kn+Kp))*Pk[bj];
+                tmp_num += exp(-Kn/2*pow(cabs(C[bj]),2)+
+                        cabs(conj(y[i])*C[bj]*Kn+Kp))*Pk[bj];
             }
             
             // Denominator of the logarithm
             for(j=0; j<M/2; j++)
             {
                 bj = insert_zero(j, k, m) + (1<<k);
-                B = B0*exp(-Kn/2*(pow(cabs(y[i]),2)+pow(cabs(C[bj]),2)));
                 
-                tmp_den += B*exp(cabs(conj(y[i])*C[bj]*Kn+Kp))*Pk[bj];
+                tmp_den += exp(-Kn/2*pow(cabs(C[bj]),2)+
+                        cabs(conj(y[i])*C[bj]*Kn+Kp))*Pk[bj];
             }
             
             // Calculate LLR
