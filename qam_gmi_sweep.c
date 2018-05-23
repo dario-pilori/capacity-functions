@@ -19,23 +19,23 @@ double *linspace(double start, double end, unsigned int num);
 int main(int argc, char *argv[])
 {
 	// Declare variables	
-	double Es, sigma_n, start_snr, end_snr;
-    double *snr, *mi, *gmi;
+	double Es, sigma_n, start_snr, end_snr, tmp_Pk, lambda;
+    double *snr, *mi, *gmi, *Pk;
 	double complex C[MAX_M_QAM];
-    int i;
-	int M_qam, num_snr;
+	int M_qam, num_snr, i;
 	char cst_name[10];
     const char *out_file = "mi_gmi_res.txt";
     FILE *fd;
 	
 	// Get values from command line
-	if (argc >= 5) {
+	if (argc >= 6) {
 	  strncpy(cst_name, argv[1], 9);
 	  start_snr = atof(argv[2]);
 	  end_snr = atof(argv[3]);
 	  num_snr = atoi(argv[4]);
+      lambda = atof(argv[5]);
 	} else {
-	  printf("Usage: %s <constellation> <start_snr> <end_snr> <num_snr>\n",argv[0]);
+	  printf("Usage: %s <constellation> <start_snr> <end_snr> <num_snr> <lambda>\n",argv[0]);
 	  return 1;
 	}
 
@@ -43,7 +43,22 @@ int main(int argc, char *argv[])
 	M_qam = get_constellation(C, cst_name);
 	if(M_qam == 0)
 	  return 1;
-    Es = complex_symbol_energy(C, M_qam);
+    
+    // Calculate probabilities
+    tmp_Pk = 0;
+    Pk = (double *) malloc(M_qam*sizeof(double));
+    for(i=0; i<M_qam; i++) {
+        Pk[i] = exp(-lambda*pow(cabs(C[i]),2));
+        tmp_Pk += Pk[i];
+    }
+    
+    // Normalize probability
+    for(i=0; i<M_qam; i++) {
+        Pk[i] /= tmp_Pk;
+    }    
+    
+    // Calculate symbol energy
+    Es = complex_symbol_energy(C, Pk, M_qam);
 
     // Get snr
     snr = linspace(start_snr, end_snr, num_snr);
@@ -58,9 +73,12 @@ int main(int argc, char *argv[])
     #pragma omp parallel for private(sigma_n)
     for(i=0; i<num_snr; i++) {
 	    sigma_n = sqrt(Es) * pow(10.0,-snr[i]/20.0);
-	    gmi[i] = qam_eval_gmi(C, M_qam, sigma_n);
-	    mi[i] = qam_eval_mi(C, M_qam, sigma_n);
+	    gmi[i] = qam_eval_gmi(C, M_qam, sigma_n, Pk);
+	    mi[i] = qam_eval_mi(C, M_qam, sigma_n, Pk);
     }
+    
+    // Free probabilities
+    free(Pk);
 
     // Print results
     printf("  SNR    |    MI    |   GMI\n------------------------------\n");
