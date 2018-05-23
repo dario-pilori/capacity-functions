@@ -9,6 +9,7 @@
 #include <complex.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <omp.h>
 #include "capacity_functions.h"
 
 // Gauss-Hermite parameters
@@ -297,14 +298,13 @@ double qam_montecarlo_mi(const double complex *y, int Ns, const double complex *
     double MI = 0;
     double tmp;
     int i, l, j;
-    const unsigned int m = log2(M);
     
-    // For each received symbol
-    #pragma omp parallel for private(tmp,i,j) reduction(-:MI)
-    for(l=0; l<Ns; l++)
+    // Cycle through constellation point
+    for(i=0; i<M; i++)    
     {
-        // Cycle through constellation point
-        for(i=0; i<M; i++)
+        // For each received symbol
+        #pragma omp parallel for private(tmp,j) reduction(-:MI)
+        for(l=0; l<Ns; l++)
         {
             tmp = 0.0;
             
