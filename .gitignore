@@ -54,3 +54,6 @@ dkms.conf
 
 # Random stuff
 *.c~
+
+# Documentation
+doxygen

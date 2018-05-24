@@ -5,7 +5,7 @@
 * Copyright (c) 2018 Dario Pilori, Politecnico di Torino <dario.pilori@polito.it>
 * Licensed under MIT license
 */
-// Includes
+/* Includes */
 #include <math.h>
 #include <complex.h>
 #include <stdlib.h>
@@ -13,7 +13,7 @@
 #include <omp.h>
 #include "capacity_functions.h"
 
-// Gauss-Hermite parameters
+/* Gauss-Hermite parameters */
 const double x[N_GH] = {-3.436159118837737603327,
 -2.532731674232789796409,
 -1.756683649299881773451,
@@ -35,7 +35,7 @@ const double w[N_GH] = {7.64043285523262062916E-6,
 0.001343645746781232692202,
 7.64043285523262062916E-6};
 
-// Helper function to calculate symbol energy
+/* Helper function to calculate symbol energy */
 double symbol_energy(const double *C, const double *Pk, int M)
 {
 	int i;
@@ -49,7 +49,7 @@ double symbol_energy(const double *C, const double *Pk, int M)
 	return Es;
 }
 
-// Helper function to insert a zero at position k of number i with nb bits
+/* Helper function to insert a zero at position k of number i with nb bits */
 unsigned int insert_zero(unsigned int i, unsigned int k, unsigned int nb)
 {
   unsigned int b0, left, right;
@@ -61,7 +61,7 @@ unsigned int insert_zero(unsigned int i, unsigned int k, unsigned int nb)
   return b0;
 }
 
-// Helper function to calculate symbol energy
+/* Helper function to calculate symbol energy */
 double complex_symbol_energy(const double complex *C, const double *Pk, int M)
 {
 	int i;
@@ -75,7 +75,7 @@ double complex_symbol_energy(const double complex *C, const double *Pk, int M)
 	return Es;
 }
 
-// Helper function to evaluate log(sum(exp(.))) in a safe way
+/* Helper function to evaluate log(sum(exp(.))) in a safe way */
 void maxxx(double *a, double b)
 {
     if(*a>b)
@@ -94,15 +94,15 @@ double pam_eval_mi(const double *C, int M, double s, const double *Pk)
   double tmp;
   int i, l, j;
 
-  // Cycle through constellation point
+  /* Cycle through constellation point */
   for(i=0; i<M; i++)
   {
-     // Cycle through Gauss-Hermite parameters
+     /* Cycle through Gauss-Hermite parameters */
      for(l=0; l<N_GH; l++)
      {
        tmp = 0.0;
        
-       // Cycle through constellation point for the logarithm
+       /* Cycle through constellation point for the logarithm */
        for(j=0; j<M; j++)
        {
          tmp += Pk[j]*exp(-(pow(C[j]-C[i],2.0) - sqrt(8.0)*x[l]*s*(C[j]-C[i]))/(2*pow(s,2.0)));
@@ -128,16 +128,16 @@ double pam_montecarlo_mi(const double *y, int Ns, const double *C,
     int i, l, j;
     const unsigned int m = log2(M);
     
-    // For each received symbol
+    /* For each received symbol */
     #pragma omp parallel for private(tmp,i,j)
     for(l=0; l<Ns; l++)
     {
-        // Cycle through constellation point
+        /* Cycle through constellation point */
         for(i=0; i<M; i++)
         {
             tmp = 0.0;
             
-            // Cycle through constellation point for the logarithm
+            /* Cycle through constellation point for the logarithm */
             for(j=0; j<M; j++)
             {
                 tmp += exp(-(pow(C[j]-C[i],2.0) +
@@ -148,7 +148,7 @@ double pam_montecarlo_mi(const double *y, int Ns, const double *C,
         }
     }
     
-    // Prepare output
+    /* Prepare output */
     MI /= Ns;
     
     return MI;
@@ -161,7 +161,7 @@ double pam_montecarlo_mi(const double *y, int Ns, const double *C,
  */
 double pam_eval_gmi(const double *C, int M, double s, const double *Pk)
 {
-  // Variables
+  /* Variables */
   const unsigned int m = log2(M);
   unsigned int i, l, j, k, b;
   unsigned int bi, bj;
@@ -169,7 +169,7 @@ double pam_eval_gmi(const double *C, int M, double s, const double *Pk)
   double tmp_num, tmp_den;
   double *Pb0;
   
-  // Calculate bit-wise probabilities
+  /* Calculate bit-wise probabilities */
   Pb0 = malloc(sizeof(double)*m);
   for(k=0; k<m; k++)
   {
@@ -181,69 +181,69 @@ double pam_eval_gmi(const double *C, int M, double s, const double *Pk)
     }
   }   
   
-  // Cycle through constellation bit
+  /* Cycle through constellation bit */
   for(k=0; k<m; k++)
   {  
-  // Bit can be either 0 or 1
+  /* Bit can be either 0 or 1 */
     for(b=0; b<=1; b++)
     {
-      // Constellation points where k-th bit is equal to b
+      /* Constellation points where k-th bit is equal to b */
       for(i=0; i<M/2; i++)
       {
         bi = insert_zero(i, k, m) + (b<<k);
         
-        // Cycle through Gauss-Hermite parameters
+        /* Cycle through Gauss-Hermite parameters */
         for(l=0; l<N_GH; l++)
         {
-          // Initialize numerator and denominator of the logarithm
+          /* Initialize numerator and denominator of the logarithm */
           tmp_num = 0.0;
           tmp_den = 0.0;
        
-          // Numerator of the logarithm
+          /* Numerator of the logarithm */
           for(j=0; j<M; j++)
           {
             tmp_num += exp(-(pow(C[bi]-C[j],2.0) - sqrt(8.0)*x[l]*s*(C[bi]-C[j]))/(2*pow(s,2.0)))*Pk[j];
           }
         
-          // Denominator of the logarithm
+          /* Denominator of the logarithm */
           for(j=0; j<M/2; j++)
           {
             bj = insert_zero(j, k, m) + (b<<k);
             tmp_den += exp(-(pow(C[bi]-C[bj],2.0) - sqrt(8.0)*x[l]*s*(C[bi]-C[bj]))/(2*pow(s,2.0)))*Pk[bj];
           }
           
-          // Apply bit probability
+          /* Apply bit probability */
           if(b)
             tmp_den /= 1-Pb0[k];
           else
             tmp_den /= Pb0[k];
        
-          // Evaluate GMI
+          /* Evaluate GMI */
           GMI -= w[l]*log2(tmp_num/tmp_den)*Pk[bi];
         } 
       }
     }
   }
   
-  // Divide by sqrt(pi) according to G-H
+  /* Divide by sqrt(pi) according to G-H */
   GMI /= sqrt(M_PI);
   
-  // Add entropy of constellation
+  /* Add entropy of constellation */
   for(j=0; j<M; j++)
   {
     GMI -= Pk[j]*log2(Pk[j]);
   }
   
-  // Remove entropy of each bit
+  /* Remove entropy of each bit */
   for(k=0; k<m; k++)
   {
     GMI += Pb0[k]*log2(Pb0[k]);
     GMI += (1-Pb0[k])*log2(1-Pb0[k]);
   }
-  // Free memory and return
+  /* Free memory and return */
   free(Pb0);
 
-  // Sanity check
+  /* Sanity check */
   if(GMI < 0)
     GMI = 0.0;
   
@@ -261,17 +261,17 @@ double qam_eval_mi(const double complex *C, int M, double s, const double *Pk)
   int i, l1, l2, j;
   const unsigned int m = log2(M);
 
-  // Cycle through constellation point
+  /* Cycle through constellation point */
   for(i=0; i<M; i++)
   {
-     // Cycle through Gauss-Hermite parameters
+     /* Cycle through Gauss-Hermite parameters */
      for(l1=0; l1<N_GH; l1++)
      {
        for(l2=0; l2<N_GH; l2++)
        {
          tmp = 0.0;
        
-         // Cycle through constellation point for the logarithm
+         /* Cycle through constellation point for the logarithm */
          for(j=0; j<M; j++)
          {
            tmp += exp(-( pow(cabs(C[j]-C[i]),2.0) - 
@@ -283,7 +283,7 @@ double qam_eval_mi(const double complex *C, int M, double s, const double *Pk)
      }
   }
   
-  // Prepare output
+  /* Prepare output */
   MI /= M_PI;
   
   return MI;
@@ -300,16 +300,16 @@ double qam_montecarlo_mi(const double complex *y, int Ns, const double complex *
     double tmp;
     int i, l, j;
     
-    // Cycle through constellation point
+    /* Cycle through constellation point */
     for(i=0; i<M; i++)    
     {
-        // For each received symbol
+        /* For each received symbol */
         #pragma omp parallel for private(tmp,j) reduction(-:MI)
         for(l=0; l<Ns; l++)
         {
             tmp = 0.0;
             
-            // Cycle through constellation point for the logarithm
+            /* Cycle through constellation point for the logarithm */
             for(j=0; j<M; j++)
             {
                 tmp += exp(-(pow(cabs(C[j]-C[i]),2.0) +
@@ -320,7 +320,7 @@ double qam_montecarlo_mi(const double complex *y, int Ns, const double complex *
         }
     }
     
-    // Prepare output
+    /* Prepare output */
     MI /= Ns;
     
     return MI;
@@ -340,7 +340,7 @@ double qam_eval_gmi(const double complex *C, int M, double s, const double *Pk)
   double tmp_num, tmp_den;
   double *Pb0;
   
-  // Calculate bit-wise probabilities
+  /* Calculate bit-wise probabilities */
   Pb0 = malloc(sizeof(double)*m);
   for(k=0; k<m; k++)
   {
@@ -352,34 +352,34 @@ double qam_eval_gmi(const double complex *C, int M, double s, const double *Pk)
     }
   }   
 
-  // Cycle through constellation bit
+  /* Cycle through constellation bit */
   for(k=0; k<m; k++)
   {  
-  // Bit can be either 0 or 1
+  /* Bit can be either 0 or 1 */
     for(b=0; b<=1; b++)
     {
-      // Constellation points where k-th bit is equal to b
+      /* Constellation points where k-th bit is equal to b */
       for(i=0; i<M/2; i++)
       {
         bi = insert_zero(i, k, m) + (b<<k);
         
-        // Cycle through Gauss-Hermite parameters
+        /* Cycle through Gauss-Hermite parameters */
         for(l1=0; l1<N_GH; l1++)
         {
           for(l2=0; l2<N_GH; l2++)
           {
-            // Initialize numerator and denominator of the logarithm
+            /* Initialize numerator and denominator of the logarithm */
             tmp_num = 0.0;
             tmp_den = 0.0;
        
-            // Numerator of the logarithm
+            /* Numerator of the logarithm */
             for(j=0; j<M; j++)
             {
               tmp_num += exp(-(pow(cabs(C[bi]-C[j]),2.0) - 
               	         2*s*creal((x[l1]+I*x[l2])*(C[bi]-C[j])))/pow(s,2.0))*Pk[j];
             }
         
-            // Denominator of the logarithm
+            /* Denominator of the logarithm */
             for(j=0; j<M/2; j++)
             {
               bj = insert_zero(j, k, m) + (b<<k);
@@ -387,13 +387,13 @@ double qam_eval_gmi(const double complex *C, int M, double s, const double *Pk)
               	         2*s*creal((x[l1]+I*x[l2])*(C[bi]-C[bj])))/pow(s,2.0))*Pk[bj];
             }
        
-          // Apply bit probability
+          /* Apply bit probability */
           if(b)
             tmp_den /= 1-Pb0[k];
           else
             tmp_den /= Pb0[k];
             
-          // Evaluate GMI
+          /* Evaluate GMI */
           GMI -= w[l1]*w[l2]*log2(tmp_num/tmp_den)*Pk[bi];
           
           }
@@ -402,26 +402,26 @@ double qam_eval_gmi(const double complex *C, int M, double s, const double *Pk)
     }
   }
   
-  // Prepare output
+  /* Prepare output */
   GMI /= M_PI;
   
-  // Add entropy of constellation
+  /* Add entropy of constellation */
   for(j=0; j<M; j++)
   {
     GMI -= Pk[j]*log2(Pk[j]);
   }
   
-  // Remove entropy of each bit
+  /* Remove entropy of each bit */
   for(k=0; k<m; k++)
   {
     GMI += Pb0[k]*log2(Pb0[k]);
     GMI += (1-Pb0[k])*log2(1-Pb0[k]);
   }  
   
-  // Free memory
+  /* Free memory */
   free(Pb0);
   
-  // Sanity check if GMI is negative
+  /* Sanity check if GMI is negative */
   if(GMI < 0)
     GMI = 0.0;
   
@@ -438,32 +438,32 @@ void qam_soft_decode(const double complex *y, int Ns, const double complex *C,
   int i, k, j, bj;
   double tmp_num, tmp_den;
   
-  // Cycle through received symbol
+  /* Cycle through received symbol */
   #pragma omp parallel for private(tmp_num,tmp_den,bj,k,j)
   for(i=0; i<Ns; i++)
   {
-    // Cycle through constellation bit
+    /* Cycle through constellation bit */
     for(k=m-1; k>=0; k--)
     {
-      // Initialize numerator and denominator of the logarithm
+      /* Initialize numerator and denominator of the logarithm */
       tmp_num = 0.0;
       tmp_den = 0.0;
       
-      // Numerator of the logarithm
+      /* Numerator of the logarithm */
       for(j=0; j<M/2; j++)
       {
         bj = insert_zero(j, k, m);
         tmp_num += exp(-pow(cabs(y[i]-C[bj]),2.0)/s2[bj])*Pk[bj];
       }
       
-      // Denominator of the logarithm
+      /* Denominator of the logarithm */
       for(j=0; j<M/2; j++)
       {
         bj = insert_zero(j, k, m) + (1<<k);
         tmp_den += exp(-pow(cabs(y[i]-C[bj]),2.0)/s2[bj])*Pk[bj];
       }
       
-      // Calculate LLR
+      /* Calculate LLR */
       l[i*m + k] = log(tmp_num/tmp_den);
     }      
   }
@@ -479,32 +479,32 @@ void pam_soft_decode(const double *y, int Ns, const double *C,
   int i, k, j, bj;
   double tmp_num, tmp_den;
   
-  // Cycle through received symbol
+  /* Cycle through received symbol */
   #pragma omp parallel for private(tmp_num,tmp_den,bj,k,j)
   for(i=0; i<Ns; i++)
   {
-    // Cycle through constellation bit
+    /* Cycle through constellation bit */
     for(k=m-1; k>=0; k--)
     {
-      // Initialize numerator and denominator of the logarithm
+      /* Initialize numerator and denominator of the logarithm */
       tmp_num = 0.0;
       tmp_den = 0.0;
       
-      // Numerator of the logarithm
+      /* Numerator of the logarithm */
       for(j=0; j<M/2; j++)
       {
         bj = insert_zero(j, k, m);
         tmp_num += exp(-pow(y[i]-C[bj],2.0)/(2*s2[bj]))*Pk[bj];
       }    
       
-      // Denominator of the logarithm
+      /* Denominator of the logarithm */
       for(j=0; j<M/2; j++)
       {
         bj = insert_zero(j, k, m) + (1<<k);
         tmp_den += exp(-pow(y[i]-C[bj],2.0)/(2*s2[bj]))*Pk[bj];
       }
       
-      // Calculate LLR
+      /* Calculate LLR */
       l[i*m + k] = log(tmp_num/tmp_den);
     }      
   }
@@ -522,18 +522,18 @@ void qam_soft_decode_pn(const double complex *y, int Ns, const double complex *C
     int i, k, j, bj;
     double tmp_num, tmp_den;
             
-    // Cycle through received symbol
+    /* Cycle through received symbol */
     #pragma omp parallel for private(tmp_num,tmp_den,bj,k,j)
     for(i=0; i<Ns; i++)
     {        
-        // Cycle through constellation bit
+        /* Cycle through constellation bit */
         for(k=m-1; k>=0; k--)
         {
-            // Initialize numerator and denominator of the logarithm
+            /* Initialize numerator and denominator of the logarithm */
             tmp_num = 0.0;
             tmp_den = 0.0;
             
-            // Numerator of the logarithm
+            /* Numerator of the logarithm */
             for(j=0; j<M/2; j++)
             {
                 bj = insert_zero(j, k, m);                
@@ -542,7 +542,7 @@ void qam_soft_decode_pn(const double complex *y, int Ns, const double complex *C
                         cabs(conj(y[i])*C[bj]*Kn+Kp))*Pk[bj];
             }
             
-            // Denominator of the logarithm
+            /* Denominator of the logarithm */
             for(j=0; j<M/2; j++)
             {
                 bj = insert_zero(j, k, m) + (1<<k);
@@ -551,7 +551,7 @@ void qam_soft_decode_pn(const double complex *y, int Ns, const double complex *C
                         cabs(conj(y[i])*C[bj]*Kn+Kp))*Pk[bj];
             }
             
-            // Calculate LLR
+            /* Calculate LLR */
             l[i*m + k] = log(tmp_num)-log(tmp_den);
         }
     }
@@ -569,18 +569,18 @@ void qam_soft_decode_pn_maxlog(const double complex *y, int Ns, const double com
     double tmp_num, tmp_den, max_num, max_den;
     double alpha, beta;
         
-    // Cycle through received symbol
+    /* Cycle through received symbol */
     #pragma omp parallel for private(tmp_num,tmp_den,bj,k,j,alpha,beta,max_num,max_den)
     for(i=0; i<Ns; i++)
     {
-        // Cycle through constellation bit
+        /* Cycle through constellation bit */
         for(k=m-1; k>=0; k--)
         {
-            // Initialize numerator and denominator of the logarithm
+            /* Initialize numerator and denominator of the logarithm */
             max_num = 0.0;
             max_den = 0.0;
             
-            // Numerator of the logarithm
+            /* Numerator of the logarithm */
             for(j=0; j<M/2; j++)
             {
                 bj = insert_zero(j, k, m);                
@@ -595,7 +595,7 @@ void qam_soft_decode_pn_maxlog(const double complex *y, int Ns, const double com
                     max_num = tmp_num;
             }
             
-            // Denominator of the logarithm
+            /* Denominator of the logarithm */
             for(j=0; j<M/2; j++)
             {
                 bj = insert_zero(j, k, m) + (1<<k);
@@ -610,7 +610,7 @@ void qam_soft_decode_pn_maxlog(const double complex *y, int Ns, const double com
                     max_den = tmp_den;
             }
             
-            // Calculate LLR
+            /* Calculate LLR */
             l[i*m + k] = max_num-max_den;
         }
     }
