@@ -2,7 +2,8 @@
 * capacity_functions.c
 * Set of functions to evaluate capacity
 *
-* 2018 - Dario Pilori <dario.pilori@polito.it>
+* Copyright (c) 2018 Dario Pilori, Politecnico di Torino <dario.pilori@polito.it>
+* Licensed under MIT license
 */
 // Includes
 #include <math.h>
