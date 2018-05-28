@@ -54,6 +54,7 @@ dkms.conf
 
 # Random stuff
 *.c~
+matlab-test/
 
 # Documentation
 doxygen
