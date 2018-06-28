@@ -39,6 +39,9 @@ qam_gmi: qam_gmi.o capacity_functions.o
 qam_gmi_sweep: qam_gmi_sweep.o capacity_functions.o
 	$(CC) $(CFLAGS) $(LDFLAGS) $^ -o $@
 
+qam_gmi_lambda_sweep: qam_gmi_lambda_sweep.o capacity_functions.o
+	$(CC) $(CFLAGS) $(LDFLAGS) $^ -o $@
+
 %.o: %.c
 	$(CC) $(CFLAGS) -c $<
 
