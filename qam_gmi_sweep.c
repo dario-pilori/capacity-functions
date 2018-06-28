@@ -1,7 +1,8 @@
 /*
 * qam_gmi_sweep.c 	Calculate MI/GMI with Gauss-Hermite quadrature with multiple SNR
 *
-* 2018 - Dario Pilori <dario.pilori@polito.it>
+* 2018 - Dario Pilori, Politecnico di Torino <dario.pilori@polito.it>
+* MIT License
 */
 #include <stdio.h>
 #include <stdlib.h>

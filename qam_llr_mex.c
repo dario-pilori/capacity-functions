@@ -8,13 +8,14 @@
  * Pk    :=   Probability of each constellation symbol
  *
  * Use this function to compute log-likelihood-ratios
- * for M-QAM constellations.
+ * for M-QAM constellations assuming an AWGN channel.
  *
  * Compile with: mex -lm -R2018a qam_llr_mex.c
  * (requires MATLAB R2018a or newer versions)
  * Works under 64-bit Linux. Don't know/care under other OSs.
  *
- * 2018 - Dario Pilori <dario.pilori@polito.it>
+ * 2018 - Dario Pilori, Politecnico di Torino <dario.pilori@polito.it>
+ * MIT License
  */
 #include <math.h>
 #include <complex.h>

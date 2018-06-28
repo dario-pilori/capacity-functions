@@ -1,3 +1,11 @@
+/*
+* pam_gmi.c
+* Simple program to test pam_eval_mi and pam_eval_gmi functions.
+*
+* Copyright (c) 2018 Dario Pilori, Politecnico di Torino <dario.pilori@polito.it>
+* MIT License
+*/
+
 #include <stdio.h>
 #include <math.h>
 #include "capacity_functions.h"

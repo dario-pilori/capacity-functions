@@ -13,7 +13,8 @@
  * (requires MATLAB R2018a or newer versions)
  * Works under 64-bit Linux. Don't know/care under other OS.
  *
- * 2018 - Dario Pilori <dario.pilori@polito.it>
+ * 2018 - Dario Pilori, Politecnico di Torino <dario.pilori@polito.it>
+ * MIT License
  */
 #include <math.h>
 #include <complex.h>

@@ -7,7 +7,8 @@
  * Compile with: mex -R2018a -lm calculate_pbit_mex.c
  * Works under 64-bit Linux. Don't know/care under other OSs.
  *
- * 2018 - Dario Pilori <dario.pilori@polito.it>
+ * 2018 - Dario Pilori, Politecnico di Torino <dario.pilori@polito.it>
+ * MIT License
  */
 #include "mex.h"
 #include <math.h>

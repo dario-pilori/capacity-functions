@@ -3,7 +3,7 @@
 * Set of functions to evaluate capacity
 *
 * Copyright (c) 2018 Dario Pilori, Politecnico di Torino <dario.pilori@polito.it>
-* Licensed under MIT license
+* MIT License
 */
 /* Includes */
 #include <math.h>
@@ -513,7 +513,7 @@ void pam_soft_decode(const double *y, int Ns, const double *C,
 
 /* 
  * Calculate Log-Likelihood Ratios (LLRs) for QAM assuming a BICM-AWGN channel
- * with phase noise.
+ * with phase noise (10.1109/TWC.2014.040714.130731)
  */
 void qam_soft_decode_pn(const double complex *y, int Ns, const double complex *C,
         const double *Pk, int M, double Kn, double Kp, double *l)
@@ -559,7 +559,7 @@ void qam_soft_decode_pn(const double complex *y, int Ns, const double complex *C
 
 /* 
  * Calculate Log-Likelihood Ratios (LLRs) for QAM assuming a BICM-AWGN channel
- * with phase noise. This function uses the max-log approximation
+ * with phase noise (10.1109/TWC.2014.040714.130731). This function uses the max-log approximation.
  */
 void qam_soft_decode_pn_maxlog(const double complex *y, int Ns, const double complex *C,
         const double *Pk, int M, double Kn, double Kp, double *l)
