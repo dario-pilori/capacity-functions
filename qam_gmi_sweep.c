@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
     
     // Calculate probabilities
     tmp_Pk = 0;
-    Pk = (double *) malloc(M_qam*sizeof(double));
+    Pk = malloc(M_qam*sizeof(double));
     for(i=0; i<M_qam; i++) {
         Pk[i] = exp(-lambda*pow(cabs(C[i]),2));
         tmp_Pk += Pk[i];
@@ -67,8 +67,8 @@ int main(int argc, char *argv[])
         return 1;
 
     // Allocate MI and GMI
-    mi = (double *) malloc(num_snr*sizeof(double));
-    gmi = (double *) malloc(num_snr*sizeof(double));
+    mi = malloc(num_snr*sizeof(double));
+    gmi = malloc(num_snr*sizeof(double));
     
     // Parallel evaluation of MI and GMI
     #pragma omp parallel for private(sigma_n)
@@ -114,7 +114,7 @@ double *linspace(double start, double end, unsigned int num)
         return NULL;
 
     // Allocate vector of SNR
-    vec = (double *) malloc(num*sizeof(double));
+    vec = malloc(num*sizeof(double));
 
     // Fill
     inc = (end - start)/(num - 1);
