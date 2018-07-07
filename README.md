@@ -9,13 +9,15 @@ with the aid of the header file [capacity_functions.h](capacity_functions.h).
 Since most of people use [MATLAB](https://www.mathworks.com/), this code includes MEX-functions to call the C functions using MATLAB.
 
 ## System requirements and compilation instructions
-The code has been succesfully tested on 64-bit Linux (CentOS 7 and Arch Linux). It has never been tested on other operating systems.
-To compile it, it requires the following software/libraries:
+The code has been designed for 64-bit Linux. Windows-specific instructions are available [here](Windows_Compile.md).
+
+To compile it under Linux, it requires the following software/libraries:
 - MATLAB R2018a (or newer versions)
 - OpenMP
+- GCC
+- Make
 
 To compile it, just run `make`.
-
 
 ## Included functions
 Full documentation of the function is written using [Doxygen](http://www.stack.nl/~dimitri/doxygen/).
