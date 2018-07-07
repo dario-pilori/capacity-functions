@@ -35,7 +35,7 @@
 *.i*86
 *.x86_64
 *.hex
-*.mexa64
+*.mex*
 
 # Debug files
 *.dSYM/
@@ -52,7 +52,7 @@ Module.symvers
 Mkfile.old
 dkms.conf
 
-# Random stuff
+# MATLAB stuff
 *.c~
 matlab-test/
 
