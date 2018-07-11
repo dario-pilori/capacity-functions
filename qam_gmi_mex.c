@@ -1,7 +1,7 @@
 /*
  * qam_gmi_mex.c - Compute MI and GMI for QAM
  * 
- * Usage: qam_gmi_mex(C, SNR, Pk)
+ * Usage: [gmi,mi] = qam_gmi_mex(C, SNR, Pk)
  * C    :=   Complex constellation in Gray-mapping order
  * SNR  :=   Vector of SNR (Es/No, dB)
  * Pk   :=   Probability of each constellation symbol
@@ -58,8 +58,8 @@ void mexFunction(int nlhs, mxArray *plhs[],
     plhs[1] = mxCreateDoubleMatrix((mwSize)N,1,mxREAL);
     
     /* get a pointer to the real data in the output matrix */
-    mi = mxGetDoubles(plhs[0]);
-    gmi = mxGetDoubles(plhs[1]);
+    mi = mxGetDoubles(plhs[1]);
+    gmi = mxGetDoubles(plhs[0]);
     
     /* Calculate symbol energy */
     Es = complex_symbol_energy(C, Pk, M);
