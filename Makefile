@@ -4,7 +4,7 @@ CFLAGS = -O2 -fopenmp -fPIC -march=native
 MEX_CFLAGS = -O2 -fopenmp -fPIC -march=native
 LDFLAGS = -lm -fopenmp
 
-all: qam_gmi_mex qam_llr_mex calculate_pbit_mex qam_mi_montecarlo_mex pam_mi_montecarlo_mex qam_llr_pn_mex qam_llr_pn_maxlog_mex
+all: qam_gmi_mex qam_llr_mex calculate_pbit_mex qam_mi_montecarlo_mex pam_mi_montecarlo_mex qam_llr_pn_mex qam_llr_pn_maxlog_mex qam_symbllr_mex
 
 qam_llr_pn_mex: capacity_functions.o
 	$(MEX) CFLAGS="$(MEX_CFLAGS)" LDFLAGS="$(LDFLAGS)" -R2018a $< $@.c
