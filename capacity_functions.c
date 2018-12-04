@@ -628,8 +628,11 @@ void qam_symbol_decode(const double complex *y, int Ns, const double complex *C,
     /* Cycle through received symbol */
     for(i=0; i<Ns; i++)
     {
+        /* First LLR is always zero */
+        l[i*M] = 0.0;
+        
         /* Cycle through constellation points */
-        for(m=0; m<M; m++)
+        for(m=1; m<M; m++)
         {
             /* Calculate LLR */
             l[i*M + m] = log(Pk[m]/Pk[0]) + (
