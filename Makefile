@@ -30,6 +30,9 @@ qam_mi_montecarlo_mex: capacity_functions.o
 pam_mi_montecarlo_mex: capacity_functions.o
 	$(MEX) CFLAGS="$(MEX_CFLAGS)" LDFLAGS="$(LDFLAGS)" -R2018a $< $@.c
 
+qam_symbllr_mex: capacity_functions.o
+	$(MEX) CFLAGS="$(MEX_CFLAGS)" LDFLAGS="$(LDFLAGS)" -R2018a $< $@.c
+
 pam_gmi: pam_gmi.o capacity_functions.o
 	$(CC) $(CFLAGS) $(LDFLAGS) $^ -o $@
 

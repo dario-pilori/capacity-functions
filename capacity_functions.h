@@ -204,4 +204,19 @@ double qam_montecarlo_mi(const double complex *y, int Ns, const double complex *
 double pam_montecarlo_mi(const double *y, int Ns, const double *C,
         const double *Pk, int M, double s2);
 
+/*! \brief QAM AWGN soft decision
+ *
+ *  This function calculates symbol-wise log-likelihood ratios (LLRs) for a complex
+ *  constellation (e.g. QAM), assuming an AWGN channel.
+ * \param[in]  y     Received complex samples
+ * \param[in]  Ns    Number of complex samples
+ * \param[in]  C     Complex constellation (e.g. QAM)
+ * \param[in]  Pk    Probability of each constellation point
+ * \param[in]  M     Number of constellation points
+ * \param[in]  s2    Variance of complex-valued AWGN
+ * \param[out] l     Symbol-wise log-likelihood ratios
+ */
+void qam_symbol_decode(const double complex *y, int Ns, const double complex *C,
+        const double *Pk, int M, double s2, double *l);
+
 #endif /* CAPACITY_FUNCTIONS_H */

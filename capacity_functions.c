@@ -616,3 +616,27 @@ void qam_soft_decode_pn_maxlog(const double complex *y, int Ns, const double com
     }
 }
 
+/* 
+ * Calculate symbol-wise Log-Likelihood Ratios (LLRs) for QAM assuming an AWGN channel.
+ */
+void qam_symbol_decode(const double complex *y, int Ns, const double complex *C,
+        const double *Pk, int M, double s2, double *l)
+{
+    int i, m;
+
+    #pragma omp parallel for private(m)
+    /* Cycle through received symbol */
+    for(i=0; i<Ns; i++)
+    {
+        /* Cycle through constellation points */
+        for(m=0; m<M; m++)
+        {
+            /* Calculate LLR */
+            l[i*M + m] = log(Pk[m]/Pk[0]) + (
+                    pow(cabs(C[0]),2)-pow(cabs(C[m]),2)+
+                    2*creal(conj(y[i])*(C[m]-C[0]))
+                    )/s2;
+        }
+    }
+}
+
