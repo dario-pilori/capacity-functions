@@ -219,4 +219,20 @@ double pam_montecarlo_mi(const double *y, int Ns, const double *C,
 void qam_symbol_decode(const double complex *y, int Ns, const double complex *C,
         const double *Pk, int M, double s2, double *l);
 
+/*! \brief QAM BICM max-log soft decision
+ *
+ *  This function calculates bit-wise log-likelihood ratios (LLRs) for a complex
+ *  constellation (e.g. QAM), assuming a pragmatic (BICM) decoder over
+ *  an AWGN channel. The max-log approximation is applied.
+ * \param[in]  y     Received complex samples
+ * \param[in]  Ns    Number of complex samples
+ * \param[in]  C     Complex constellation (e.g. QAM)
+ * \param[in]  Pk    Probability of each constellation point
+ * \param[in]  M     Number of constellation points
+ * \param[in]  s2    Variance of complex-valued AWGN
+ * \param[out] l     Bit-wise log-likelihood ratios
+ */
+void qam_soft_decode_maxlog(const double complex *y, int Ns, const double complex *C,
+        const double *Pk, int M, const double *s2, double *l);
+
 #endif /* CAPACITY_FUNCTIONS_H */

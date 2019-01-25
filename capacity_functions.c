@@ -566,11 +566,11 @@ void qam_soft_decode_pn_maxlog(const double complex *y, int Ns, const double com
 {
     const int m = log2(M);
     int i, k, j, bj;
-    double tmp_num, tmp_den, max_num, max_den;
+    double tmp, max_num, max_den;
     double alpha, beta;
         
     /* Cycle through received symbol */
-    #pragma omp parallel for private(tmp_num,tmp_den,bj,k,j,alpha,beta,max_num,max_den)
+    #pragma omp parallel for private(tmp,bj,k,j,alpha,beta,max_num,max_den)
     for(i=0; i<Ns; i++)
     {
         /* Cycle through constellation bit */
@@ -587,12 +587,12 @@ void qam_soft_decode_pn_maxlog(const double complex *y, int Ns, const double com
                 alpha = Kp + Kn*creal(conj(y[i])*C[bj]);
                 beta = -Kn*cimag(conj(y[i])*C[bj]);
                 
-                tmp_num = -pow(cabs(C[bj]),2)*Kn/2 +
+                tmp = -pow(cabs(C[bj]),2)*Kn/2 +
                         sqrt(pow(alpha,2)+pow(beta,2)) + 
                         log(Pk[bj]);
                 
-                if(tmp_num>max_num)
-                    max_num = tmp_num;
+                if(tmp>max_num)
+                    max_num = tmp;
             }
             
             /* Denominator of the logarithm */
@@ -602,12 +602,12 @@ void qam_soft_decode_pn_maxlog(const double complex *y, int Ns, const double com
                 alpha = Kp + Kn*creal(conj(y[i])*C[bj]);
                 beta = -Kn*cimag(conj(y[i])*C[bj]);
                 
-                tmp_den = -pow(cabs(C[bj]),2)*Kn/2 +
+                tmp = -pow(cabs(C[bj]),2)*Kn/2 +
                         sqrt(pow(alpha,2)+pow(beta,2)) +
                         log(Pk[bj]);
                 
-                if(tmp_den>max_den)
-                    max_den = tmp_den;
+                if(tmp>max_den)
+                    max_den = tmp;
             }
             
             /* Calculate LLR */
@@ -642,4 +642,51 @@ void qam_symbol_decode(const double complex *y, int Ns, const double complex *C,
         }
     }
 }
+
+/* 
+ * Calculate Log-Likelihood Ratios (LLRs) for QAM assuming a BICM-AWGN channel. This
+ * function uses the MAX-LOG approximation (high SNR).
+ */
+void qam_soft_decode_maxlog(const double complex *y, int Ns, const double complex *C,
+        const double *Pk, int M, const double *s2, double *l)
+{
+  const int m = log2(M);
+  int i, k, j, bj;
+  double max_log_num, max_log_den, tmp;
+  
+  /* Cycle through received symbol */
+  #pragma omp parallel for private(max_log_num,max_log_den,bj,k,j,tmp)
+  for(i=0; i<Ns; i++)
+  {
+    /* Cycle through constellation bit */
+    for(k=m-1; k>=0; k--)
+    {
+      /* Initialize numerator and denominator of the logarithm */
+      max_log_num = -INFINITY;
+      max_log_den = -INFINITY;
+      
+      /* Numerator of the logarithm */
+      for(j=0; j<M/2; j++)
+      {
+        bj = insert_zero(j, k, m);
+        tmp = -pow(cabs(y[i]-C[bj]),2.0)/s2[bj] + log(Pk[bj]);
+        if(tmp>max_log_num)
+                max_log_num = tmp;
+      }
+      
+      /* Denominator of the logarithm */
+      for(j=0; j<M/2; j++)
+      {
+        bj = insert_zero(j, k, m) + (1<<k);
+        tmp = -pow(cabs(y[i]-C[bj]),2.0)/s2[bj] + log(Pk[bj]);
+        if(tmp>max_log_den)
+                max_log_den = tmp;
+      }
+      
+      /* Calculate LLR */
+      l[i*m + k] = max_log_num - max_log_den;
+    }      
+  }
+}
+
 
