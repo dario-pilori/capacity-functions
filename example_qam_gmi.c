@@ -1,7 +1,7 @@
 /*
-* qam_gmi.c 	Simple program to calculate MI/GMI with Gauss-Hermite quadrature
+* example_qam_gmi.c 	Simple program to calculate MI/GMI with Gauss-Hermite quadrature
 *
-* 2018 - Dario Pilori, Politecnico di Torino <dario.pilori@polito.it>
+* Copyright (c) 2018 Dario Pilori, Politecnico di Torino <dario.pilori@polito.it>
 * MIT License
 */
 #include <stdio.h>

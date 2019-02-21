@@ -1,5 +1,5 @@
 /*
-* pam_gmi.c
+* example_pam_gmi.c
 * Simple program to test pam_eval_mi and pam_eval_gmi functions.
 *
 * Copyright (c) 2018 Dario Pilori, Politecnico di Torino <dario.pilori@polito.it>
@@ -10,7 +10,6 @@
 #include <math.h>
 #include "capacity_functions.h"
 #define M_PAM 4
-#define N_BIT 2
 
 int main(int argc, char *argv[])
 {
@@ -22,9 +21,8 @@ int main(int argc, char *argv[])
 	
 	// Constellation (natural bit mapping order)
 	double C[M_PAM] = {-3.0, -1.0, 3.0, 1.0};
-	//double Pk[M_PAM] = {0.25, 0.25, 0.25, 0.25};
+    // Probability for each symbol to be transmitted
 	double Pk[M_PAM] = {0.5, 0.3, 0.15, 0.05};
-	double Pb[N_BIT];
 
 	// Signal-to-noise ratio (dB)
 	double snr = 10;

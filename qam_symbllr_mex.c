@@ -1,7 +1,7 @@
 /*
  * qam_symbllr_mex.c - Compute LLRs for QAM
  *
- * Usage: qam_symbllr_mex(C, sigma2, y, Pk)
+ * Usage: l = qam_symbllr_mex(C, sigma2, y, Pk)
  * C     :=   Complex constellation in Gray-mapping order
  * sigma2:=   Noise variance
  * y     :=   Received complex symbols
@@ -12,9 +12,9 @@
  *
  * Compile with: mex -lm -R2018a qam_llr_mex.c
  * (requires MATLAB R2018a or newer versions)
- * Works under 64-bit Linux. Don't know/care under other OSs.
+ * Designed for 64-bit Linux.
  *
- * 2018 - Dario Pilori, Politecnico di Torino <dario.pilori@polito.it>
+ * Copyright (c) 2018 - Dario Pilori, Politecnico di Torino <dario.pilori@polito.it>
  * MIT License
  */
 #include <math.h>

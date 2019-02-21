@@ -5,9 +5,9 @@
  * Pk   :=   Probability of each constellation symbol
  *
  * Compile with: mex -R2018a -lm calculate_pbit_mex.c
- * Works under 64-bit Linux. Don't know/care under other OSs.
+ * Designed for 64-bit Linux.
  *
- * 2018 - Dario Pilori, Politecnico di Torino <dario.pilori@polito.it>
+ * Copyright (c) 2018 Dario Pilori, Politecnico di Torino <dario.pilori@polito.it>
  * MIT License
  */
 #include "mex.h"

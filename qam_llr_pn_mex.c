@@ -11,12 +11,14 @@
  * Use this function to compute log-likelihood-ratios
  * for M-QAM constellations assuming an AWGN channel
  * with phase noise (10.1109/TWC.2014.040714.130731). 
+ * The output of this function is comptabible to MATLAB's qamdemod()
+ * function of the Communication System Toolbox.
  *
  * Compile with: mex -lm -R2018a qam_llr_pn_mex.c
  * (requires MATLAB R2018a or newer versions)
- * Works under 64-bit Linux. Don't know/care under other OSs.
+ * Designed for 64-bit Linux.
  *
- * 2018 - Dario Pilori, Politecnico di Torino <dario.pilori@polito.it>
+ * Copyright (c) 2018 - Dario Pilori, Politecnico di Torino <dario.pilori@polito.it>
  * MIT License
  */
 #include <complex.h>

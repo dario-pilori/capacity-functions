@@ -55,6 +55,7 @@ dkms.conf
 # MATLAB stuff
 *.c~
 matlab-test/
+*.m~
 
 # Documentation
 doxygen

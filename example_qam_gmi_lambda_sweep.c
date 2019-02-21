@@ -1,7 +1,7 @@
 /*
-* qam_gmi_lambda_sweep.c 	Calculate MI/GMI with Gauss-Hermite quadrature with multiple SNR and lambdas
+* example_qam_gmi_lambda_sweep.c 	Test program to calculate MI/GMI with Gauss-Hermite quadrature with multiple SNR and lambdas
 *
-* 2018 - Dario Pilori, Politecnico di Torino <dario.pilori@polito.it>
+* Copyright (c) 2018 Dario Pilori, Politecnico di Torino <dario.pilori@polito.it>
 * MIT License
 */
 #include <stdio.h>
@@ -211,5 +211,3 @@ int get_constellation(double complex *C, const char *cst_name)
   fclose(fd);
   return M_qam;
 }
-
-

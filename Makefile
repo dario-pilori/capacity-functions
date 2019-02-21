@@ -36,16 +36,16 @@ pam_mi_montecarlo_mex: capacity_functions.o
 qam_symbllr_mex: capacity_functions.o
 	$(MEX) CFLAGS="$(MEX_CFLAGS)" LDFLAGS="$(LDFLAGS)" -R2018a $< $@.c
 
-pam_gmi: pam_gmi.o capacity_functions.o
+example_pam_gmi: example_pam_gmi.o capacity_functions.o
 	$(CC) $(CFLAGS) $(LDFLAGS) $^ -o $@
 
-qam_gmi: qam_gmi.o capacity_functions.o
+example_qam_gmi: example_qam_gmi.o capacity_functions.o
 	$(CC) $(CFLAGS) $(LDFLAGS) $^ -o $@
 
-qam_gmi_sweep: qam_gmi_sweep.o capacity_functions.o
+example_qam_gmi_sweep: example_qam_gmi_sweep.o capacity_functions.o
 	$(CC) $(CFLAGS) $(LDFLAGS) $^ -o $@
 
-qam_gmi_lambda_sweep: qam_gmi_lambda_sweep.o capacity_functions.o
+example_qam_gmi_lambda_sweep: example_qam_gmi_lambda_sweep.o capacity_functions.o
 	$(CC) $(CFLAGS) $(LDFLAGS) $^ -o $@
 
 %.o: %.c
