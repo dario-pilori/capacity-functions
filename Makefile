@@ -1,6 +1,6 @@
 CC = gcc
 MEX = mex
-CFLAGS = -O2 -fopenmp -fPIC -march=native
+CFLAGS = -O2 -fopenmp -march=native
 MEX_CFLAGS = -O2 -fopenmp -fPIC -march=native
 LDFLAGS = -lm -fopenmp
 

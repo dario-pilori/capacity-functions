@@ -32,6 +32,7 @@ formats.
 ## References
 - [F. Kayhan and G. Montorsi, "Constellation Design for Memoryless Phase Noise Channels," in IEEE Transactions on Wireless Communications, vol. 13, no. 5, pp. 2874-2883, May 2014](https://doi.org/10.1109/TWC.2014.040714.130731)
 - [A. Alvarado, T. Fehenberger, B. Chen and F. M. J. Willems, "Achievable Information Rates for Fiber Optics: Applications and Computations," in Journal of Lightwave Technology, vol. 36, no. 2, pp. 424-439, Jan 15, 2018.](https://doi.org/10.1109/JLT.2017.2786351)
+- [D. Pilori, "Advanced Digital Signal Processing Techniques for High-Speed Optical Links," Ph.D. Thesis, Mar 22, 2019.](https://hdl.handle.net/11583/2729814)
 
 ## License
 This code is released under [MIT License](https://opensource.org/licenses/MIT).
