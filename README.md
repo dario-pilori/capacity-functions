@@ -1,3 +1,4 @@
+[![DOI](https://zenodo.org/badge/140095242.svg)](https://zenodo.org/badge/latestdoi/140095242)
 # Capacity functions
 
 This project contains some simple C functions to evaluate basic information-theoretical quantities in a communication system. 
