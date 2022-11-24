@@ -5,8 +5,8 @@
  *  project. These function can either be directly called with a small
  *  C program, or used with MATLAB's MEX library.
  *  
- * Copyright (c) 2018-2019 Dario Pilori, Politecnico di Torino <dario.pilori@polito.it>
- * MIT License
+ * Copyright (c) 2018-2022 Dario Pilori, Politecnico di Torino <dario.pilori@polito.it>
+ * SPDX-License-Identifier: MIT
 */
 
 /* Include guard */

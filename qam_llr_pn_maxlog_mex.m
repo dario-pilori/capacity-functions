@@ -18,6 +18,6 @@
 % Designed for 64-bit Linux.
 %
 % Copyright (c) 2018 - Dario Pilori, Politecnico di Torino <dario.pilori@polito.it>
-% MIT License
+% SPDX-License-Identifier: MIT
 
 %   MEX File function.

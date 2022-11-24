@@ -15,7 +15,7 @@
  * Works under 64-bit Linux. Don't know/care under other OSs.
  *
  * Copyright (c) 2018 Dario Pilori, Politecnico di Torino <dario.pilori@polito.it>
- * MIT License
+ * SPDX-License-Identifier: MIT
  */
 #include <math.h>
 #include <complex.h>

@@ -3,8 +3,8 @@
 * Set of functions to evaluate capacity
 * Designed for 64-bit Linux.
 *
-* Copyright (c) 2018 Dario Pilori, Politecnico di Torino <dario.pilori@polito.it>
-* MIT License
+* Copyright (c) 2018-2022 Dario Pilori, Politecnico di Torino <dario.pilori@polito.it>
+* SPDX-License-Identifier: MIT
 */
 /* Includes */
 #include <math.h>

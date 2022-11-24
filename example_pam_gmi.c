@@ -2,8 +2,8 @@
 * example_pam_gmi.c
 * Simple program to test pam_eval_mi and pam_eval_gmi functions.
 *
-* Copyright (c) 2018 Dario Pilori, Politecnico di Torino <dario.pilori@polito.it>
-* MIT License
+* Copyright (c) 2018-2022 Dario Pilori, Politecnico di Torino <dario.pilori@polito.it>
+* SPDX-License-Identifier: MIT
 */
 
 #include <stdio.h>

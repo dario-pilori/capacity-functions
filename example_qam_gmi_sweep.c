@@ -2,7 +2,7 @@
 * example_qam_gmi_sweep.c 	Test program to calculate MI/GMI with Gauss-Hermite quadrature with multiple SNR
 *
 * Copyright (c) 2018 Dario Pilori, Politecnico di Torino <dario.pilori@polito.it>
-* MIT License
+* SPDX-License-Identifier: MIT
 */
 #include <stdio.h>
 #include <stdlib.h>
