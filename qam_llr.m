@@ -1,9 +1,7 @@
 function l = qam_llr(C, sigma2, y, Pk)
-%QAM_LLR  Compute LLRs for QAM
+%QAM_LLR  Compute LLRs
 % Use this function to compute log-likelihood-ratios
-% for M-QAM constellations assuming an AWGN channel.
-% The output of this function is comptabible to MATLAB's qamdemod()
-% function of the Communication System Toolbox.
+% for M-QAM and M-PAM constellations assuming an AWGN channel.
 %
 % Usage: l = qam_llr_mex(C, sigma2, y, Pk)
 % C     :=   Complex constellation in Gray-mapping order
@@ -22,7 +20,6 @@ end
 validateattributes(sigma2,{'double'},{'column','nrows',size(C,1)},'','sigma2',2);
 validateattributes(y,{'double'},{'column'},'','y',3);
 validateattributes(Pk,{'double'},{'column','nrows',size(C,1)},'','Pk',4);
-
 
 % Constellation size
 M = size(C,1);
